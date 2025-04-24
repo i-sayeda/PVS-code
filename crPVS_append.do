@@ -535,10 +535,18 @@ append using "$data_mc/02 recoded data/input data files/pvs_co_pe_uy_wave2.dta"
 
 qui do `label14'
 
+tempfile label15
+label save q4_label2 q5_label2 q7_label q8_label q33_label2 q51_label2 using `label15'
+label drop q4_label2 q5_label2 q7_label q8_label q33_label2 q51_label2
+
+append using "$data_mc/02 recoded data/input data files/pvs_ec.dta"
+
+qui do `label15'
+
 ********************************************************************************
 * Country - add new countries here
-lab def labels0 11 "Lao PDR" 12 "United States" 13 "Mexico" 14 "Italy" ///
-				15 "Republic of Korea" 16 "Argentina (Mendoza)" ///
+lab def labels0 1 "Ecuador "11 "Lao PDR" 12 "United States" 13 "Mexico" ///
+				14 "Italy" 15 "Republic of Korea" 16 "Argentina (Mendoza)" ///
 				17 "United Kingdom" 18 "Greece" 19 "Romania" 20 "Nigeria" ///
 				21 "China" 22 "Somaliland" 23 "Nepal", modify				
 
@@ -628,7 +636,10 @@ recode q36_v1 (. = .a) if country == 2 | country == 3 | country == 4 | country =
 recode q37 (. = .a) if country != 21 | country != 22 | country != 23 | wave !=2		
 
 *LAC wave 2:
-recode q6_lac q31_lac (. = .a) if wave !=2 | country !=2 | country !=7 | country !=10	 
+recode q6_lac q31_lac (. = .a) if wave !=2 | country !=2 | country !=7 | country !=10
+
+* Ecuador:
+recode q13a_ec q14_ec q31c_ec q32_ec q44_ec (. = .a) if country !=1
 	
 *-------------------------------------------------------------------------------*	
 	

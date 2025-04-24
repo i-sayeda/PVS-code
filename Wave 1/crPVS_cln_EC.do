@@ -495,8 +495,8 @@ recode q30 (1 = 1 "High cost (e.g., high out of pocket payment, not covered by i
 		   (5 = 5 "Staff don't show respect (e.g., staff is rude, impolite, dismissive)") ///
 		   (6 = 6 "Medicines and equipment are not available (e.g., medicines regularly out of stock, equipment like X-ray machines broken or unavailable)") ///
 		   (7 = 7 "Illness not serious enough") ///
-		   (8 = 19 "EC: Insurance problems (e.g., my insurance expired, I was not eligible for it)") ///
-		   (9 = 20 "EC: Difficulty getting an appointment (e.g., there was no appointment, appointments were scheduled far in advance)") ///
+		   (8 = 21 "EC: Insurance problems (e.g., my insurance expired, I was not eligible for it)") ///
+		   (9 = 22 "EC: Difficulty getting an appointment (e.g., there was no appointment, appointments were scheduled far in advance)") ///
 		   (8 = 8 "COVID-19 restrictions (e.g., lockdowns, travel restrictions, curfews)") ///
 		   (9 = 9 "COVID-19 fear") ///
 		   (10 = 10 "Other") (.a = .a "NA") ///
@@ -575,6 +575,11 @@ drop q2 q3 q3a_co_pe_uy_ar q5 q8 q9 q10 q12_a q12_b q13a_ec q14_ec q16 q19 q24 q
 q28_a q28_b q30 q32_ec q34 q35 q36 q37 q41_a q41_b q41_c q45 q46 q50 q51 cell1 cell2 q11 q13 q20 q26 q29 q31a q31b q31c_ec q17 q25 ///
 q38_a q38_b q38_c q38_d q38_e q38_f q38_g q38_h q38_i q38_j q38_k q40_a q40_b q40_c q40_d q42 q43 q44_ec q47 q48 q49
 
+ren rec* *
+
+*******************************************************************************
+	
+* all vars missing labels from values:
 label define gender .a "NA" .d "Don't know" .r "Refused",add
 label define gender2 .a "NA" .d "Don't know" .r "Refused",add	
 label define q4_label .a "NA" .d "Don't know" .r "Refused",add	
@@ -587,12 +592,20 @@ label define q13a_ec_label .a "NA" .d "Don't know" .r "Refused",add
 label define q15_label .a "NA" .d "Don't know" .r "Refused",add
 label define q33_label .a "NA" .d "Don't know" .r "Refused",add
 
+* for appending process:
+label copy q4_label q4_label2
+label copy q5_label q5_label2
+label copy q33_label q33_label2
+label copy q51_label q51_label2
+
+label val q4 q4_label2
+label val q5 q5_label2
+lab val q33 q33_label2
+lab val q51 q51_label2
+
+label drop q4_label q5_label q33_label q51_label
 
 *------------------------------------------------------------------------------*
-* Renaming variables 
-* Rename variables to match question numbers in current survey
-
-ren rec* *
 
 *Reorder variables
 order q*, sequential
