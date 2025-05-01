@@ -112,9 +112,23 @@ drop p36
 *------------------------------------------------------------------------------*
 * Generate recoded variables
 
+
+* Generate variables
+
+*gen respondent_id = "EC" + string(respondent_serial)
+*drop respondent_serial
+
 gen country = 1
 lab def country 1 "Ecuador"
 lab values country country
+
+gen mode = 1
+lab def mode 1 "CATI"
+lab val mode mode
+
+gen language = 1001
+lab def lang 1001 "EC: Spanish"
+lab val language lang
 
 * Generate q6 from p61 p62 p63 p64 p65 p66 p67 p68
 * SI Note: response options for q6 were stored as separate variables so will recode these into q7 below
@@ -134,7 +148,7 @@ replace recq7 = 4 if p7 == . & p65 == 1
 replace recq7 = 5 if p7 == . & p66 == 1
 replace recq7 = 6 if p7 == . & p67 == 1
 replace recq7 = .r if p7 == . & p68 == 1
-replace recq7 = .a if p7 == . & p61 == 1 /// Note: missing q7 only if they indicated they do not have insurance 
+replace recq7 = .a if p7 == . & p61 == 1 // Note: missing q7 only if they indicated they do not have insurance 
 
 gen q7_other = p6_6
 drop p61 p62 p63 p64 p65 p66 p67 p68 p6_6 p7
@@ -252,7 +266,6 @@ ren rec* *
 
 * gen rec variable for variables that have overlap values to be country code * 1000 + variable 
 
-*gen reclanguage = country*1000 + language // SI: missing from dataset
 *gen recinterviewer_id = country*1000 + interviewer_id // SI: missing from dataset
 
 gen recq4 = country*1000 + q4
@@ -578,7 +591,7 @@ q38_a q38_b q38_c q38_d q38_e q38_f q38_g q38_h q38_i q38_j q38_k q40_a q40_b q4
 ren rec* *
 
 *******************************************************************************
-	
+
 * all vars missing labels from values:
 label define gender .a "NA" .d "Don't know" .r "Refused",add
 label define gender2 .a "NA" .d "Don't know" .r "Refused",add	
@@ -595,21 +608,24 @@ label define q33_label .a "NA" .d "Don't know" .r "Refused",add
 * for appending process:
 label copy q4_label q4_label2
 label copy q5_label q5_label2
+label copy q15_label q15_label2
 label copy q33_label q33_label2
+label copy q50_label q50_label2
 label copy q51_label q51_label2
 
 label val q4 q4_label2
 label val q5 q5_label2
-lab val q33 q33_label2
-lab val q51 q51_label2
+label val q15 q15_label2
+label val q33 q33_label2
+label val q50 q50_label2
+label val q51 q51_label2
 
-label drop q4_label q5_label q33_label q51_label
-
+label drop q4_label q5_label q15_label q33_label q50_label q51_label
 *------------------------------------------------------------------------------*
 
 *Reorder variables
 order q*, sequential
-order respondent_serial country wave
+order respondent_serial mode country wave language
 
 *------------------------------------------------------------------------------*
 
@@ -681,7 +697,8 @@ order respondent_serial respondent_id mode country language date time int_length
 lab var country "Country"
 lab var respondent_serial "Respondent Serial #"
 lab var wave "Wave"
-*lab var language "Language" - SI: missing from dataset
+lab var language "Language"
+lab var mode "mode"
 lab var q1 "Q1. Respondent's еxact age"
 lab var q2 "Q2. Respondent's age group"
 lab var q3 "Q3. Respondent's gender"
