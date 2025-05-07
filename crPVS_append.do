@@ -557,7 +557,7 @@ lab def labels0  1 "Ecuador" 11 "Lao PDR" 12 "United States" 13 "Mexico" 14 "Ita
 recode q6 (. = .a) if inlist(country,9,11,14,15,17) 
 
 * Ethiopia, India, Kenya, Greece, Nigeria, Romania, South Africa, Nepal
-recode q14_multi q44_multi q32_multi (. = .a) if country != 3 | country != 4 | country != 5 | ///
+recode q14_multi q44_multi q32_multi (. = .a) if country != 1 | country != 3 | country != 4 | country != 5 | ///
 									   country != 18 | country != 20 | country != 19 | country != 9 | country !=23
 
 * Peru:
@@ -636,16 +636,23 @@ recode q36_v1 (. = .a) if country == 2 | country == 3 | country == 4 | country =
 recode q37 (. = .a) if country != 21 | country != 22 | country != 23 | wave !=2		
 
 *LAC wave 2:
-recode q6_lac q31_lac q14_lac (. = .a) if wave !=2 | country !=2 | country !=7 | country !=10	 
+recode q6_lac q31_lac q14_lac (. = .a) if wave !=2 | country !=2 | country !=7 | country !=10
+
+* Ecuador: 
+recode q13a_ec q14_ec q31c_ec q32_ec q44_ec (. = .a) if country != 1
 	
 *-------------------------------------------------------------------------------*	
-	
+* Country-specific value labels
+lab def Language 1001 "EC: Spanish", modify
+
 * Other value label modifcations
 lab def exc_poor_judge 5 "I am unable to judge" .d "Don't know", modify
 lab def exc_poor_staff 5 "I have not had prior visits or tests" 6 "The clinic had no other staff" .a "NA", modify
 lab def exc_pr_hlthcare 5 "I did not receive healthcare from this provider in the past 12 months" .a "NA",modify
 lab def exc_pr_visits 5 "I have not had prior visits or tests" 6 "The clinic had no other staff" .a "NA", modify
-lab def labels26 14 "CN: Trust hospital" 15 "SO: Determined by the family in the cities", modify
+lab def labels26 14 "CN: Trust hospital" 15 "SO: Determined by the family in the cities" 16 "EC: Ease of getting appointment", modify
+lab def labels37 21 "EC: Insurance problems (e.g., my insurance expired, I was not eligible for it)" ///
+22 "EC: Difficulty getting an appointment (e.g., there was no appointment, appointments were scheduled far in advance)", modify
 lab def q15_label2 5016 "Mobile clinic", modify
 
 
@@ -654,11 +661,11 @@ recode country (22 = 1 "Somaliland") (3 = 2 "Ethiopia") (5 = 3 "Kenya") ///
 			   (20 = 4 "Nigeria") (9 = 5 "South Africa") ///
 			   (7 = 6 "Peru") (2 = 7 "Colombia") ///
 			   (13 = 8 "Mexico") (10 = 9 "Uruguay") ///
-			   (16 = 10 "Argentina") (11 = 11 "Lao PDR") (23 = 12 "Nepal") ///
-			   (4 = 13 "India") (21 = 14 "China") (15 = 15 "Rep. of Korea") ///
-			   (19 = 16 "Romania") (18 = 17 "Greece") ///
-			   (14 = 18 "Italy") (17 = 19 "United Kingdom") ///
-			   (12 = 20 "United States"), gen(country_reg)
+			   (16 = 10 "Argentina") (1 = 11 "Ecuador") (11 = 12 "Lao PDR") (23 = 13 "Nepal") ///
+			   (4 = 14 "India") (21 = 15 "China") (15 = 16 "Rep. of Korea") ///
+			   (19 = 17 "Romania") (18 = 18 "Greece") ///
+			   (14 = 19 "Italy") (17 = 20 "United Kingdom") ///
+			   (12 = 21 "United States"), gen(country_reg)
 lab var country_reg "Country (ordered by region)" 
 
 *-------------------------------------------------------------------------------*	
@@ -705,7 +712,7 @@ lab var weight  "Weight"
 lab var q1 "Q1. Respondent's еxact age"
 lab var q2 "Q2. Respondent's age group"
 lab var q3 "Q3. Respondent's gender"
-lab var q3a_co_pe_uy_ar "Q3a. CO/PE/UY/AR only: Are you a man or a woman?"
+lab var q3a_co_pe_uy_ar "Q3a. CO/PE/UY/AR/EC only: Are you a man or a woman?"
 lab var q4 "Q4. County, state, region where respondent lives"
 lab var q4_other_it "Q4. Other"
 lab var q5 "Q5. Type of area where respondent lives"
@@ -734,6 +741,10 @@ lab var q13b_la "Q13B. LA only: Is there one hospital, health center, or clinic 
 lab var q13e_co_pe_uy_ar_v1 "Q13E (V1.0). CO/PE/UY/AR only: Why didn't you receive health care for COVID-19?"
 lab var q13e_other_co_pe_uy_ar_v1 "Q13E_Other (V1.0). CO/PE/UY only: Other"
 lab var q13a_co_pe_uy "Q13a. LAC only: Is there one healthcare facility or healthcare provider's group you usually go to for most of your healthcare?"
+lab var q13a_ec "Q13a. EC only: Are there any other places, such as pharmacies, traditional healers, or alternative medicine, that you go to most frequently for care?"
+lab var q13a_ec_other "Q13a. EC only: Other"
+lab var q14_ec "Q14. EC only: Is this facility...?"
+lab var q14_ec_other "Q14. EC only: Other"
 lab var q14_lac "Q14. LAC only: Usual type"
 lab var q14_ar "Q14. AR only: Is this facility Public, OSEP, Other 'obras sociales', A medical center/hospital owned by PAMI, or Private/prepaid?"
 lab var q14_cn "Q14. CN only: Is this a public, private, or NGO/faith-based healthcare facility?"
@@ -802,10 +813,13 @@ lab var q30_other "Q30. Other"
 lab var q31_a "Q31a. In the past 12 months, have you ever needed to borrow money from family, friends, or another source to pay for healthcare"
 lab var q31_b "Q31b. In the past 12 months, have you ever needed to sell items such as furniture or jewelry to pay for healthcare"
 lab var q31_lac "Q31. LAC only: In the last 12 months, have you stopped paying any utility bills (cable, electricity, water, etc.) to pay for healthcare?"
+lab var q31c_ec "Q31c. EC only: Stopped paying any utilities (cable, electricity, water, etc.) to pay for healthcare"
 lab var q32_ar "Q32. AR only: Is this facility Public, OSEP, or Private?"
 lab var q32_cn "Q32. CN only: Last visit facility type public/private/social security/NGO/faith-based?"
 lab var q32_co_pe_v1 "Q32 (V1.0). CO/PE only: Is this a public or private healthcare facility?"
 lab var q32_co_pe_uy "Q32. CO/PE/UY only: Facility ownership"
+lab var q32_ec "Q32. EC only: The facility of your last face-to-face visit is ... ?"
+lab var q32_ec_other "Q32. EC only: Other"
 lab var q32_it "Q32. IT only: Did you go to a public facility, a private facility accredited by the Servizio Sanitario Nazionale (SSN) or a private facility not accredited by SSN?"
 lab var q32_kr "Q32. KR only: Is this...public, private, or non-profit/religious medical...?"
 lab var q32_la "Q32. LA only: Is this a public or private hospital?"
@@ -864,6 +878,7 @@ lab var q42 "Q42. How would you rate the quality of public healthcare system in 
 lab var q43 "Q43. How would you rate the quality of private healthcare?"
 *lab var q44 "Q44. What type of healthcare facility is this?"
 lab var q44_multi "Q44. ET/GR/IN/KE/NG/RO/ZA only: How would you rate quality of NGO/faith-based healthcare?"
+lab var q44_ec "Q44. EC only: How would you rate quality of the social security health system (IESS)?"
 lab var q44_pe "Q44. PE only: How would you rate the quality of the social security system?"
 lab var q44_uy "Q44. UY only: How would you rate the quality of the mutual healthcare system?"
 lab var q44a_ar "Q44a. AR only: How would you rate the quality of care provided by OSEP of Mendoza?"

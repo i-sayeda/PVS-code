@@ -79,14 +79,14 @@ lab def pa 0 "Not activated" ///
 			.r "Refused", replace
 lab val activation pa
 
-* usual_reason - confirm placements of 11-13
+* usual_reason - confirm placements of 11-16
 recode q16 (2 = 1 "Convenience (short distance)") /// 
 			(1 8 = 2 "Cost (low cost, covered by insurance)") ///
 			(4 = 3 "Technical quality (provider skills)") ///
 			(3 5 10  = 4 "Interpersonal quality (short waiting time, respect)") ///
 			(6 = 5 "Service readiness (medicines and equipment available)") ///
 			(7 = 6 "Only facility available") ///
-			(.r 9 11 12 13 14 15 997 = .r "Other or Refused") ///
+			(.r 9 11 12 13 14 15 16 997 = .r "Other or Refused") ///
 			(.a = .a "NA") , gen(usual_reason)
 
 * visits
@@ -134,7 +134,7 @@ egen visits_total = rowtotal(q18_q19 q22 q23)
 * value label for all numeric var
 lab val visits visits_total visits_home visits_tele na_rf
 
-* unmet_reason - confirm placements of 12-15
+* unmet_reason - confirm placements of 12-22
 recode q30 (1 = 1 "Cost (High cost)") ///
 			(2 = 2 "Convenience (Far distance)") ///
 			(3 5 11 = 3 "Interpersonal quality (Long waiting time, Respect)") ///
@@ -346,10 +346,10 @@ replace conf_getafford=.r if conf_sick==.r | conf_afford==.r
 lab val conf_getafford vc_nc_der
 
 *urban/rural
-recode q5 (9001 9002 9003 5006 5007 7006 7007 2009 2010 3009 3010 10012 10013 11001 11003 ///
+recode q5 (1001 1002 9001 9002 9003 5006 5007 7006 7007 2009 2010 3009 3010 10012 10013 11001 11003 ///
 		   12001 13001 14001 12002 13002 14002 12003 13003 14003 15001 16001 16002 ///
            4015 4016 17001 17002 17003 18018 19021 20022 20023 21001 21002 22001 = 1 "Urban") ///
-          (9004 5008 7008 2011 3011 10014 11002 12004 13004 14004 15002 16003 4017 17004 ///
+          (1003 9004 5008 7008 2011 3011 10014 11002 12004 13004 14004 15002 16003 4017 17004 ///
 		  18019 19020 20024 21003 21004 22002 22003 = 0 "Rural") ///
 		  (.r = .r "Refused"), gen(urban)
 
@@ -374,29 +374,29 @@ recode insured (.a = .r) if q6_za == .r
 recode q7 (2017 2018 3001 5003 2017 2018 7010 10019 11002 12002 12003 ///
 		   12005 14002 16001 4023 4024 4025 4026 17002 2030 ///
 		   18029 19031 20034 20037 21001 21002 21003 21005 22002 = 0 "Public") ///
-		  (2028 3002 5004 5005 5006 3007 9008 9009 2028 7013 10021 11001 12001 ///
+		  (1004 1005 2028 3002 5004 5005 5006 3007 9008 9009 2028 7013 10021 11001 12001 ///
 		  12004 13005 14001 16005 4027 17001 18004 18030 19032 19033 19034 20035 ///
 		  20036 21004 22001 22003 22004 = 1 "Private") /// 
 		  (2015 2016 16002 16003 16004 13001 13002 13004 7011 7012 10020 10022 ///
 		  = 2 "Social security/military") ///
-		  (2995 9995 12995 13995 4995 18995 19995 20995 21006 = 3 "Other") ///
-		  (.r = .r "Refused") (2030 7014 13014 16007 13003 .a = .a "NA"), gen(insur_type)
+		  (1006 2995 9995 12995 13995 4995 18995 19995 20995 21006 = 3 "Other") ///
+		  (.r = .r "Refused") (1000 2030 7014 13014 16007 13003 .a = .a "NA"), gen(insur_type)
 
 recode insur_type (.a = 1) if q6_za == 1
 recode insur_type (.a = 1) if q7_kr == 1
 recode insur_type (.a = 0) if q7_kr == 0		 	  
 		  
 * education
-recode q8 (3001 3002 5007 9012 9013 2025 2026 7018 7019 10032 10033 11001 13001 ///
+recode q8 (1001 1002 3001 3002 5007 9012 9013 2025 2026 7018 7019 10032 10033 11001 13001 ///
 		   14001 12001 15001 16001 16002 4039 17001 18045 19052 20058 21001 21002 ///
 		   22001 22002 = 0 "None (or no formal education)") ///
-          (3003 5008 9014 9015 2027 7020 10034 11002 13002 14002 14003 12002 12003 ///
+          (1003 3003 5008 9014 9015 2027 7020 10034 11002 13002 14002 14003 12002 12003 ///
 		   15002 16003 4040 17002 18046 19053 20059 21003 21004 22003 22004 ///
 		   = 1 "Primary") ///
-		   (3004 5009 9016 2028 7021 10035 11003 11004 14004 14005 13003 13004 12004 ///
+		   (1004 3004 5009 9016 2028 7021 10035 11003 11004 14004 14005 13003 13004 12004 ///
 		   15003 15004 16004 4041 17003 18047 19054 19055 20060 21005 21006 ///
 		   22005 = 2 "Secondary") ///
-          (3005 5010 5011 9017 2029 2030 2031 7022 7023 7024 10036 10037 10038 11005 ///
+          (1005 1006 1007 3005 5010 5011 9017 2029 2030 2031 7022 7023 7024 10036 10037 10038 11005 ///
 		   11006 14006 14007 13005 13006 13007 12005 12006 15005 15006 15007 16005 ///
 		   16006 16007 4042 4043 4044 17004 17005 18048 18049 18050 19056 19057 20061 ///
 		   20062 21007 21008 21009 21010 22006 = 3 "Post-secondary") ///
@@ -465,6 +465,11 @@ recode usual_type_own (.a = 2) if q14_cn == 3
 *recode usual_type_own (.a = .a) if q14_cn == .a
 recode usual_type_own (.a = .d) if q14_cn == .d | q14_so == .d
 
+*Ecuador recode
+recode usual_type_own (.a = 0) if q14_ec == 1 | q14_ec == 3 | q14_ec == 4 | q14_ec == 5
+recode usual_type_own (.a = 1) if q14_ec == 2 | q14_ec == 6
+recode usual_type_own (.a = 2) if q14_ec == 7
+recode usual_type_own (.a = .a) if q14_ec == .a
 							   
 * usual type level		
 * SS: placed 21008 "CN: Other" in refused to match the other countries		  
@@ -549,6 +554,12 @@ recode last_type_own (.a = 1) if q32_so == 2 & country ==22
 recode last_type_own (.a = 2) if q32_so == 4 & country ==22
 recode last_type_own (.a = .r) if q32_so == .r & country ==22
 
+*Ecuador
+recode last_type_own (.a = 0) if q32_ec == 1 | q32_ec == 3 | q32_ec == 4 | q32_ec == 5
+recode last_type_own (.a = 1) if q32_ec == 2 | q32_ec == 6
+recode last_type_own (.a = 2) if q32_ec == 7
+recode last_type_own (.a = .r) if q32_ec == .r
+
 * Other countries:
 recode last_type_own (.a = 0) if q32_uy == 1 | q32_it == 1 | inlist(q32_mx,3,4) | ///
 								 inlist(q33,12003,12004,12005) | q32_kr == 1 | ///
@@ -611,12 +622,12 @@ lab val last_type fac_own_lvl
 *Notes: No data for AR, For India: No actual data for Bodo" or "Dogri" but it is in the country-specific sheet.
 recode q50 (11002 11003 11001 = .a) // First recode all to .a for Laos since we will be using q50a_la
 
-recode q50 (5001 5005 5008 5009 5010 5011 5012 5013 5014 5015 3023 3024 3025 ///
+recode q50 (1013 1014 1017 5001 5005 5008 5009 5010 5011 5012 5013 5014 5015 3023 3024 3025 ///
 		   3026 3027 3028 3029 3030 3031 3032 7044 7045 7049 2081  ///
 		   15002 9035 9036 9037 9038 9041 9044 2995 3995 5995 11995 3995 9995 ///
 		   4055 4062 4063 4064 4066 4068 4070 4071 4072 4073 4995 11002 11003 11005 18995 19092 19093 19995 ///
 		   20097 20099 20103 20104 20105 20107 20108 20109 20995 21002 = 1 "Minority group") /// 
-		   (5002 5003 5004 5006 5007 3021 3022 7053 2087 15001 9033 ///
+		   (1015 5002 5003 5004 5006 5007 3021 3022 7053 2087 15001 9033 ///
 		   9034 9039 9040 9042 9043 4060 4056 4067 4075 4074 4059 4076 4061 4069 4065 11001 18090 19091 ///
 		   20094 20095 20096 20098 20100 20101 20102 20106 21001 = 0 "Majority group") /// 
 		   (.r = .r "Refused") (.a = .a "NA"), gen(minority)
@@ -700,7 +711,8 @@ replace visits = . if visits > 80 & visits < . & country == 18 // 4 changes
 *Nigeria
 recode visits_tele (60 = .) if country == 20  // 1 change 
 *China
-replace visits = . if visits > 70 & visits < . & country == 21 // 1 change 
+replace visits = . if visits > 70 & visits < . & country == 21 // 1 change
+*Ecuador: (none) 
 
 * Recode extreme values to missing 
 
