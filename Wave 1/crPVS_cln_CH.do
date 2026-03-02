@@ -184,7 +184,7 @@ rename F081 q17
 drop F067
 
 rename F066 q17f_ch  // add to dd
-rename F068 q17g_ch  // add to dd
+rename F068 q17g_ch_ro  // add to dd
 rename F068_opn q17g_ch_other
 
 rename F060_1 q17_d
@@ -232,9 +232,9 @@ rename F103_5 q27_e
 rename F103_6 q27_f
 rename F103_7 q27_g
 rename F103_8 q27_h
-rename F103_9 q27k_ch_de
+rename F103_9 q27k_ch_de_ro
 rename F103_10 q27i_ch // add to dd
-rename F113 q27i_ch_de // confirm with todd
+rename F113 q27i_ch_de_ro // confirm with todd
 
 *rename F114 q28a_ch // dropped for now
 drop F114
@@ -250,8 +250,8 @@ rename F118_opn m3_ch_other
 *phq variables:
 rename F043_1 m1_a // matches mental health module for phq2 but confirm this is how we want to code this
 rename F043_2 m1_b  // matches mental health module for phq2 but confirm this is how we want to code this
-rename F043_3 m1_c_ch // doesn't match mental health module questions for phq - confirm this nomenclature is okay
-rename F043_4 m1_d_ch // doesn't match mental health module questions for phq - confirm this nomenclature is okay
+rename F043_3 m1_c_ch_ro // doesn't match mental health module questions for phq - confirm this nomenclature is okay
+rename F043_4 m1_d_ch_ro // doesn't match mental health module questions for phq - confirm this nomenclature is okay
 
 /*Primary care checks (new vars)
 rename F120_1 q28_c1_ch 
@@ -305,8 +305,8 @@ rename F133 q29
 gen q30 = .
 rename F134 q30_other // SS: no 'q30' will have to recode open-ended answers
 
-rename F135 q29a_ch
-rename F136 q29a_ch_other // SS: note will have to recode open-ended answers in the future
+rename F135 q29a_ch_ro
+rename F136 q29a_ch_ro_other // SS: note will have to recode open-ended answers in the future
 
 /*new vars
 rename F137_N_1 q31a_ch 
@@ -329,7 +329,7 @@ drop F137_N_7
 drop F137_N_999 
 drop F137_opn 
 
-rename F139 q29b_ch // add to dd
+rename F139 q29b_ch_ro // add to dd
 	
 	/*reason for sexual health care:
 	rename F140 q31j_ch
@@ -359,7 +359,7 @@ rename F154_7 q38_g
 rename F154_8 q38_h
 rename F154_9 q38_i
 rename F154_11 q38_k
-rename F154_12 q38_l_ch // add to dd
+rename F154_12 q38_l_ch_ro // add to dd
   
 rename F158 q38_e 
 rename F163 q38_j
@@ -375,9 +375,9 @@ rename F167_6  q40h_ch_de
 rename F173_1 q41_a
 rename F173_2 q41_b
 rename F173_3 q41_c
-rename F173_4 q41d_ch_de // add to dd (similar to q41d_de)
-rename F064 q41e_ch // add to dd
-rename F065 q41f_ch // add to dd
+rename F173_4 q41d_ch_de_ro // add to dd (similar to q41d_de)
+rename F064 q41e_ch_ro // add to dd
+rename F065 q41f_ch_ro // add to dd
 
 rename F177 q42
 rename F178 q45 
@@ -545,13 +545,13 @@ recode q18_q19 (.r = .r) if q19 == 999
 
 * In raw data, 999 = "I don't know/ I prefer not to answer" 
 *removed for now: q28a_ch q28b_ch q50k_ch q50l_ch q17e_ch q17_b q24a_ch q24b_ch q24c_ch q24d_ch q24e_ch
-recode q5 q8 q51a_ch q9 q10 m1_a m1_b m1_c_ch m1_d_ch q11 q11_a q12_a q12_b q17_d /// q7
-	   q17_c q12_b q41f_ch q17f_ch q17g_ch q13 q15 q16 q18 q19 q20 ///
+recode q5 q8 q51a_ch q9 q10 m1_a m1_b m1_c_ch_ro m1_d_ch_ro q11 q11_a q12_a q12_b q17_d /// q7
+	   q17_c q12_b q41f_ch_ro q17f_ch q17g_ch_ro q13 q15 q16 q18 q19 q20 ///
 	   q21 q22 q23 q25 q26 ///
-	   q27i_ch_de q28_a q28_b  m2_ch m3_ch q29 q29a_ch q29b_ch q31a q31b q33 q34 ///
-	   q35 q36 q37 q38_a q38_b q38_c q38_d q38_f q38_g q38_h q38_i q38_k q38_l_ch ///
+	   q27i_ch_de_ro q28_a q28_b  m2_ch m3_ch q29 q29a_ch_ro q29b_ch_ro q31a q31b q33 q34 ///
+	   q35 q36 q37 q38_a q38_b q38_c q38_d q38_f q38_g q38_h q38_i q38_k q38_l_ch_ro ///
 	   q38_e q38_j q39 q40_a q40_b q40_c q40_d q40e_ch_de  q40h_ch_de q41_a q41_b ///
-	   q41_c q41d_ch_de q41e_ch q42 q45 q46 q51 q51a q3b_ch (999 = .r)	
+	   q41_c q41d_ch_de_ro q41e_ch_ro q42 q45 q46 q51 q51a q3b_ch (999 = .r)	
 
 recode q8a_ch q8 q8a_ch (777 = .r) 
 	   
@@ -591,10 +591,10 @@ recode q8 (. = .a) if q8a_ch !=1
 recode q11_a (. = .a) if q3 !=2 | q1 >=50
 
 * q12_b
-recode q12_b q41f_ch (. = .a) if q3 !=2 | q1 >=20
+recode q12_b q41f_ch_ro (. = .a) if q3 !=2 | q1 >=20
 
-* q17f_ch, q17_b (add back), q17g_ch
-recode q17f_ch q17g_ch (. = .a) if q1 >=20
+* q17f_ch, q17_b (add back), q17g_ch_ro
+recode q17f_ch q17g_ch_ro (. = .a) if q1 >=20
 
 * q15
 recode q15 q16 q17 (. = .a) if q13 !=1
@@ -617,8 +617,8 @@ recode q27_b (. = .a) if q3 !=2 | q1 <=39
 * q27_c, q27i_ch
 recode q27_c q27i_ch (. = .a) if q3 !=2
 
-* q27i_ch_de
-recode q27i_ch_de (. = .a) if q1 <=49
+* q27i_ch_de_ro
+recode q27i_ch_de_ro (. = .a) if q1 <=49
 
 * q28a_ch
 *recode q28a_ch (. = .a) if q1 >=20
@@ -635,8 +635,8 @@ recode q28_a q28_b (. = .a) if q18 <=0 | q19 !=2 | q19 !=3 | q19 !=4 | q23 <= 0 
 * q30
 recode q30 (. = .a) if q29 !=1
 
-* q29b_ch
-recode q29b_ch (. = .a) if q1>=20
+* q29b_ch_ro
+recode q29b_ch_ro (. = .a) if q1>=20
 
 * q31a
 recode q31a q31b (. = .a) if q1<=20
@@ -648,7 +648,7 @@ recode q33 q34 q35 (. = .a) if q18 <=0 | q19 !=2 | q19 !=3 | q19 !=4
 recode q36 q37 (. = .a) if q35 !=1
 
 * q38
-recode q38_a q38_b q38_c q38_d q38_e q38_f q38_g q38_h q38_i q38_j q38_k q38_l_ch q39 (. = .a) if q18 <=0 | q19 !=2 | q19 !=3 | q19 !=4 
+recode q38_a q38_b q38_c q38_d q38_e q38_f q38_g q38_h q38_i q38_j q38_k q38_l_ch_ro q39 (. = .a) if q18 <=0 | q19 !=2 | q19 !=3 | q19 !=4 
 recode q38_k (. = .a) if q35 !=1
 
 * q51 
@@ -710,7 +710,7 @@ recode recq23 (. = .r) if q23 == .r
 drop q23 q23_other
 
 * q27 
-recode q27_a q27_b q27_c q27_d q27_e q27_f q27_g q27_h q27k_ch_de q27i_ch (3 = .d)
+recode q27_a q27_b q27_c q27_d q27_e q27_f q27_g q27_h q27k_ch_de_ro q27i_ch (3 = .d)
 
 * q45 
 recode q45 (1 = 2 "Getting better") (2 = 1 "Staying the same") (3 = 0 "Getting worse") ///
@@ -904,7 +904,7 @@ ren m3_ch_other_original m3_ch_other
 *------------------------------------------------------------------------------*/
 
 *Reorder variables
-	order m1_a m1_b m1_c_ch m1_d_ch m2_ch m3_ch m3_ch_other
+	order m1_a m1_b m1_c_ch_ro m1_d_ch_ro m2_ch m3_ch m3_ch_other
 	order q*, sequential
 	order respondent_id respondent_serial wave country weight language date mode 
 
