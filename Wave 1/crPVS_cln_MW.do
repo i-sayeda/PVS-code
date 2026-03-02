@@ -971,44 +971,47 @@ tab edu_3g_gender, m // 0 missing
 
 
 *********************************************************
-* WEIGHT CONSTRUCTION - Adjusting for mixed modes 
+* WEIGHT CONSTRUCTION – Adjusting for mixed modes
 * Source for phone ownership: Afrobarometer 2024/2025
-* Malawi Dispatch AD1094 - 66% of adult Malawians own mobile phone
+* Malawi Dispatch AD1094 – 66% of adult Malawians own mobile phone
 *********************************************************
 
 *********************************************************
-* STEP 1: Design weights for CATI and CAPI
+* STEP 1: Design weights for F2F (CAPI)
 * Corrects for Northern Region oversampling
-* Achieved F2F sample (from data): North=61, Central=120, South=119, Total=300
-* Population shares (census): North=12%, Central=50%, South=38%
+* Population shares (2018 Census): North=13%, Central=43%, South=44%
+* F2F regional counts computed from the data
 *********************************************************
+count if mode==2
+local n_f2f = r(N)
+
+count if mode==2 & q4_mw==2
+local n_north = r(N)
+count if mode==2 & q4_mw==1
+local n_central = r(N)
+count if mode==2 & q4_mw==3
+local n_south = r(N)
+
+di "F2F counts — North: `n_north'  Central: `n_central'  South: `n_south'  Total: `n_f2f'"
 
 gen dw_f2f = .
-
-* Northern (pop share = 12%, F2F n = 61, total F2F = 300)
-replace dw_f2f = 0.12 / (61/300) if mode==2 & inlist(region, 6005, 6008, 6025)
-
-* Central (pop share = 50%, F2F n = 120, total F2F = 300)
-replace dw_f2f = 0.50 / (120/300) if mode==2 & inlist(region, 6006, 6007, 6013, 6020, 6022, 6023)
-
-* Southern (pop share = 38%, F2F n = 119, total F2F = 300)
-replace dw_f2f = 0.38 / (119/300) if mode==2 & inlist(region, 6001, 6003, 6014, 6015, 6018, 6021)
+replace dw_f2f = 0.13 / (`n_north'   / `n_f2f') if mode==2 & q4_mw==2
+replace dw_f2f = 0.43 / (`n_central' / `n_f2f') if mode==2 & q4_mw==1
+replace dw_f2f = 0.44 / (`n_south'   / `n_f2f') if mode==2 & q4_mw==3
 
 * CATI: SRS so design weight = 1
 replace dw_f2f = 1 if mode==1
 
-* Verify - should return 0
-count if missing(dw_f2f)
+assert !missing(dw_f2f)
 
 *********************************************************
 * STEP 2: Blending weights by mode
-* Phone ownership prevalence: 69% (Afrobarometer 2024/2025, AD1094)
-* CATI frame = phone owners (69% of adult population)
-* F2F frame  = rural non-phone owners (31% of adult population)
+* Phone ownership prevalence: 66% (Afrobarometer 2024/2025, AD1094)
+* CATI frame  = phone owners (66% of adult population)
+* F2F frame   = rural non-phone owners (34% of adult population)
 *********************************************************
-
-local phone_own     = 0.69   // CATI frame share (Afrobarometer 2024, AD1094)
-local non_phone_own = 0.31   // F2F frame share
+local phone_own     = 0.66
+local non_phone_own = 0.34
 
 count if mode==1
 local n_cati = r(N)
@@ -1017,8 +1020,8 @@ local n_f2f = r(N)
 count
 local n_total = r(N)
 
-scalar cati_share = `n_cati' / `n_total'
-scalar f2f_share  = `n_f2f'  / `n_total'
+scalar cati_share = `n_cati'  / `n_total'
+scalar f2f_share  = `n_f2f'   / `n_total'
 
 gen blend_wgt = .
 replace blend_wgt = `phone_own'     / cati_share if mode==1
@@ -1029,22 +1032,19 @@ assert !missing(blend_wgt)
 *********************************************************
 * STEP 3: Combine for base weight
 *********************************************************
-
 gen base_wgt = dw_f2f * blend_wgt
 
 *********************************************************
-* STEP 4: Normalizing base weight
+* STEP 4: Normalise base weight
 * Rescale so mean = 1 (weights sum to total sample size)
 *********************************************************
-
 sum base_wgt
 gen base_wgt_norm = base_wgt / r(mean)
 
 *********************************************************
-* STEP 5: IPF raking to pop benchmarks
+* STEP 5: IPF raking to population benchmarks
 * Dimensions: age (5 levels), region (3 levels), edu_gender (8 levels)
 *********************************************************
-
 ipfweight age_5g Region edu_gender, gen(weight) startwgt(base_wgt_norm) ///
     val(43.15 23.95 14.6 8.01 10.29 ///
         13.02  43.39 43.59           ///
@@ -1054,7 +1054,6 @@ ipfweight age_5g Region edu_gender, gen(weight) startwgt(base_wgt_norm) ///
 *********************************************************
 * STEP 6: DIAGNOSTICS
 *********************************************************
-
 * Weight distribution
 sum weight, detail
 
@@ -1068,14 +1067,14 @@ tab extreme_wgt mode
 
 * Verify weighted marginals match population targets
 foreach var of varlist age_5g Region edu_gender {
-    di "--- `var' ---"
+    di _n "--- `var' ---"
     tab `var' [iweight=weight]
 }
 
-** Dropping unneeded weighting variables
-drop gender urban age_5g age_3g Region education_4g education_3g urban_gender urban_age_5g urban_age_3g region_gen edu_gender edu_3g_gender dw_f2f blend_wgt base_wgt base_wgt_norm
-		
-
+* Drop intermediate weighting variables
+drop dw_f2f blend_wgt base_wgt base_wgt_norm extreme_wgt
+drop gender urban age_5g age_3g Region education_4g education_3g ///
+     urban_gender urban_age_5g urban_age_3g region_gen edu_gender edu_3g_gender
 * Reorder variables
 
 	order q*, sequential
