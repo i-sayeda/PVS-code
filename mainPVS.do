@@ -34,7 +34,7 @@ macro drop _all
 *global user "/Users/liwei.x/Library/CloudStorage/Box-Box"
 
 * Setting file path globals
-global data "$user/QuEST Network/Core Research/People's Voice Survey/PVS External/Data"
+global data "$user/QuEST Network/Core Research/People's Voice Survey/Data"
 
 * Path to multi-country data folder (includes input and output folders for data checks)
 global data_mc "$data/Multi-country"
