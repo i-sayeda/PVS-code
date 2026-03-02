@@ -47,8 +47,8 @@ gen language = 19002
 lab def Language 19002 "RO: Romanian" 
 lab values language Language
 
-gen mode = 1
-lab def mode 1 "CAWI"
+gen mode = 3
+lab def mode 3 "CAWI"
 lab val mode mode
 
 rename wins weight
@@ -68,7 +68,7 @@ rename (q21 q22) (q12_a q12_b)
 rename (q13_1 q13_2 q13_3 q13_4 q17 q18 q18_other) (m1_a m1_b m1_c_ch_ro m1_d_ch_ro m2_ch_ro m3_ch_ro m3_ch_ro_other) // remember to change name in CH
 rename (q16 q28 q31) (q17_d q17_c q17_b) // q17_b needs to be changed in DE
 rename (q25 q26 q89) (q41e_ch_ro q41f_ch_ro q41d_ch_de_ro) // remember to change name in CH and DE
-rename (q27 q46 q46_mental) (q27k_ch_de_ro q27_i_ch_de_ro q17g_ch_ro) // remember to change names in CH and DE
+rename (q27 q46 q46_mental) (q27k_ch_de_ro q27i_ch_de_ro q17g_ch_ro) // remember to change names in CH and DE
 rename (q32 q33 q33_other q34 q34_other q35  q35_other q36 q37) (q13 q14_multi q14_other q15 q15_other q16 q16_other q17 q18)
 rename (q38 q39 q40 q42 q44) (q20 q21 q22 q23 q25)
 rename (q45_1 q45_2 q45_3 q45_4 q45_5 q45_6 q45_7 q45_8) (q27_a q27_b q27_c q27_d q27_e q27_f q27_g q27_h)
@@ -350,10 +350,10 @@ recode q21 (. = .a) if q20 !=0
 recode q24 q25 (. = .a) if q23 == 0  | q23 == .d | q23 == .r
 recode q24 (. = .r) if q23 != 0 
 
-* q27_b q27_c q27_i_ch_de_ro
+* q27_b q27_c q27i_ch_de_ro
 recode q27_b q27_c (. = .a) if q3 !=1 
 recode q27_b q27_c (. = .r) if q3 == 1
-recode q27_i_ch_de_ro (. = .a) if q1 <= 49
+recode q27i_ch_de_ro (. = .a) if q1 <= 49
 
 *q28
 recode q28_a q28_b (. = .a) if q18 == 0 | q18 == .d | q18 == .r | q19 == 0 | q19 == .d | ///
@@ -399,6 +399,14 @@ recode q8 (19002 = 19053 "RO: Primary (I-IV)") ///
 drop q8
 		  
 lab val q11_a q13 q17_b q17_c q17_d q17g_ch_ro q28_a q28_b q31a q31b yesno
+
+recode q14_multi (1 = 1 "Public") ///
+		  (2 = 2 "Private (for-profit)") ///
+		  (3 = 4 "Other(specify)") ///
+		  (4 = 3 "NGO/Faith-based ") ///
+		  (5 = 4 "Other(specify)") ///
+		  (.a = .a "NA") (.d = .d "Don't know") (.r = .r "Refused"), pre(rec) label(q14_label)
+drop q14_multi
 			
 recode q16 (.d = 22)
 
@@ -525,7 +533,7 @@ label val q33 q33_label2
 label val q50 q50_label2
 label val q51 q51_label2
 
-label drop q4_label q5_label q15_label recq33 q50_label q51_label
+label drop q4_label q5_label q15_label q33_label q50_label q51_label
 
 *------------------------------------------------------------------------------*
 
