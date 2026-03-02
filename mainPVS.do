@@ -28,6 +28,7 @@ macro drop _all
 * Setting user globals 
 
 *global user "/Users/t.lewis/Library/CloudStorage/Box-Box"
+*global user_git "/Users/t.lewis"
 *global user "/Users/toddlewis/Library/CloudStorage/Box-Box"
 *global user "/Users/shs8688/Library/CloudStorage/Box-Box"
 *global user "C:/Users/i.sayeda/Box"
@@ -43,7 +44,7 @@ global data_mc "$data/Multi-country"
 global in_out "$data_mc/03 input output"
 
 * Path to GitHub folder 
-global github "$user/Documents/GitHub/PVS-code"
+global github "$user_git/Documents/GitHub/PVS-code"
 
 /*
 ************************************************
