@@ -595,6 +595,14 @@ append using "$data_mc/02 recoded data/input data files/pvs_it_wave2.dta"
 
 qui do `label21'
 
+tempfile label22
+label save q4_label2 q5_label2 q8_label q15_label2 q33_label2 q50_label2 q51_label2 Language using `label22'
+label drop q4_label2 q5_label2 q8_label q15_label2 q33_label2 q50_label2 q51_label2 Language
+
+append using "$data_mc/02 recoded data/input data files/pvs_ro_wave2.dta"
+
+qui do `label22'
+
 ********************************************************************************
 * Country - add new countries here
 lab def labels0 1 "Ecuador" 6 "Malawi" 11 "Lao PDR" 12 "United States" 13 "Mexico" 14 "Italy" ///
@@ -707,25 +715,31 @@ recode q13a_lac q31_lac (. = .a) if country != 1 | (wave !=2 & !inlist(country, 
 recode q4_mw q47_mw (. = .a) if country !=6
 
 * Germany
-recode q2_de q4a_de q4c_de q4d_de q8a_de q14_de q15a_de q17b_de q17_c q17_d ///
+recode q2_de q4a_de q4c_de q4d_de q8a_de q14_de q15a_de q17_b q17_c q17_d ///
 q27j_de q28c_de q28d_de q32_de q40f_de q40g_de q40h_ch_de q40i_de q40j_de q41d_ch_de (. = .a) if country !=24
 recode CELL1 CELL2 q44 (. = .a) if country == 24
 
 * Germany/Switzerland
 recode q4b q11_a q17_c q17_d q27i_ch_de q27k_ch_de q40e_ch_de q40h_ch_de q41d_ch_de (. = .a) if country != 24 | country !=25
 
+* Germany/Switzerland/Romania
+recode q11_a q17_c q17_d q27i_ch_de_ro q27k_ch_de_ro q41d_ch_de_ro (. = .a) if country != 24 | country !=25 | country != 19 | wave != 2
+
 * Switzerland
 recode q3a_ch q3b_ch q4_ch q7a_ch q7b_ch q7c_ch q7d_ch q7e_ch q7f_ch q7g_ch q7h_ch q7i_ch ///
-	   q7j_ch q8a_ch q17f_ch q17g_ch_ro q27i_ch q29a_ch_ro q29b_ch q38_l_ch q41e_ch q41f_ch q50_ch_dk ///
+	   q7j_ch q8a_ch q17f_ch q27i_ch q50_ch_dk ///
 	   q50a_ch q50b_ch q50c_ch q50d_ch q50f_ch q50h_ch q50i_ch q50j_ch q50k_ch q50l_ch q50m_ch ///
-	   q51a_ch m1_c_ch m1_d_ch m2_ch m3_ch (. = .a) if country !=25
+	   q51a_ch (. = .a) if country !=25
+
+* Switzerland/Romania
+recode q17g_ch_ro q29a_ch_ro q29b_ch_ro q38_l_ch_ro q41e_ch_ro q41f_ch_ro m1_c_ch_ro m1_d_ch_ro m2_ch_ro m3_ch_ro (. = .a) if country != 25| country !=19 | wave != 2
 
 * Mental health module:
 recode m1_a m1_b m1_2_a m1_2_b m1_2_c m1_2_d m1_2_e m1_2_f m1_2_g m2_a m2_b m2_c /// 
 	  m2_d m2_e m2_f m2_g m2_h m2_i m3 m4 m5 m6_a m6_b m6_c m6_d m6_e m6_f m6_g ///
 	  m6_h m6_i m6_j m7 m8 m9 m10 m11 m12 phq2 phq2_cat phq9 phq9_cat (. = .a) if country !=12 | wave !=2
 	  
-recode m1_a m1_b (. = .a) if country !=25
+recode m1_a m1_b (. = .a) if country !=25 | country != 19 | wave != 2
 	  
 * Japan
 recode q6_jp q12c_jp q12d_jp q12e_jp q14_jp q27i_jp q27j_jp q27k_jp q27l_jp q28c_jp q28d_jp ///
@@ -735,6 +749,10 @@ recode CELL1 CELL2 q44 (. = .a) if country == 8
 * Italy Wave 2
 recode q6_it q14_it q32_it (. = .a) if country !=14
 recode CELL1 CELL2 q7 q31a q31b q37 q44 (. = .a) if country ==14 & wave == 2
+
+* Romania Wave 2 
+recode q17_b q38_m_ro (. = .a) if country != 19
+recode q26 q47 (. = .a) if country == 19 & wave == 2
 *-------------------------------------------------------------------------------*	
 	
 * Other value label modifcations
@@ -782,6 +800,8 @@ lab def main_reason 5 "SO: Allergies" 6	"SO: Blood transfusion" 7 "SO: Dental is
 lab def labels12 3 "Multiracial/indegenous",modify
 lab def labels72 .d "Don't know",modify
 lab def gender2 2 "Another gender",modify
+lab val q29a_ch_ro yesno
+label define yesno .a "NA" .d "Don't know" .r "Refused",modify
 
 *-------------------------------------------------------------------------------*	
 *** Code for survey set: For accurate SEs when using mixed CATI/CAWI and F2F surveys ***
@@ -816,8 +836,8 @@ drop respondent_num interviewer_gender interviewer_id time q1_codes intervieweri
 
 					
 * Reorder variables
-order m1_a m1_b  m1_2_a m1_2_b m1_2_c m1_2_d m1_2_e m1_2_f m1_2_g m1_c_ch m1_d_ch m2_a m2_b m2_c m2_d ///
-		  m2_e m2_f m2_g m2_h m2_i m2_i_other m2_ch m3 m3_ch m3_ch_other m4 m4_vge m5 m6_a m6_b m6_c m6_d m6_e m6_f m6_g m6_h ///
+order m1_a m1_b  m1_2_a m1_2_b m1_2_c m1_2_d m1_2_e m1_2_f m1_2_g m1_c_ch_ro m1_d_ch_ro m2_a m2_b m2_c m2_d ///
+		  m2_e m2_f m2_g m2_h m2_i m2_i_other m2_ch_ro m3 m3_ch_ro m3_ch_ro_other m4 m4_vge m5 m6_a m6_b m6_c m6_d m6_e m6_f m6_g m6_h ///
 		  m6_i m6_j m6_j_other m6_total m7 m8 m9 m10 m11 m12 phq2 phq2_cat phq9 phq9_cat visits_mental
 order q*, sequential
 order respondent_serial respondent_id mode country country_reg wave language language_other date ///
@@ -946,11 +966,11 @@ lab var q16 "Q16. Why did you choose this healthcare facility?"
 lab var q16_other "Q16. Other"
 
 lab var q17 "Q17. Overall respondent's rating of the quality received in this facility"
-lab var q17b_de "Q17b. DE only: In the past 12 months, have you ever spoken with a medical doctor or any other health care provider in private without your parents?"
+lab var q17_b "Q17b. DE only: In the past 12 months, have you ever spoken with a medical doctor or any other health care provider in private without your parents?"
 lab var q17_c "Q17c. Is there any doctor, nurse, or other health professional with whom you are comfortable talking about your sexual health or contraception?"
 lab var q17_d "Q17d. Is there any doctor, nurse, or other health professional with whom you are comfortable speaking about your mental health?"
 lab var q17f_ch "Q17f. CH only: Is there a doctor, nurse, or other health care provider with whom you can speak confidentially?" 
-lab var q17g_ch "Q17g. CH only: Are there mental or physical health services that you wish you had access to, or is there anything else you would like to improve in the health system?" 
+lab var q17g_ch_ro "Q17g. CH only: Are there mental or physical health services that you wish you had access to, or is there anything else you would like to improve in the health system?" 
 lab var q17g_ch_other "Q17g. CH only: Other mental or physical health services that you wish you had access to/would improve."
 
 lab var q18 "Q18. How many healthcare visits in total have you made in the past 12 months?"
@@ -984,9 +1004,9 @@ lab var q27i_ng "Q27i. NG only: Had sexual or reproductive health care such as f
 lab var q27i_za "Q27i. ZA only: Had a test for HIV in the past 12 months"
 lab var q27j_cn "Q27j. CN only: Received a mammogram (a special X-ray of the breast)"
 lab var q27i_us "Q27i. US only: STI test conducted in past 12 months"
-lab var q27i_ch_de "Q27i. Had a colorectal cancer screening to detect bowel cancer"
+lab var q27i_ch_de_ro "Q27i. Had a colorectal cancer screening to detect bowel cancer"
 lab var q27j_de "Q27j. DE only: Had a J2 checkup (an additional preventive check-up for adolescents)"
-lab var q27k_ch_de "Q27k. Received any counseling on contraception/birth control"
+lab var q27k_ch_de_ro "Q27k. Received any counseling on contraception/birth control"
 lab var q27i_jp "Q27i. JP only: Received an endoscope"
 lab var q27j_jp "Q27j. JP only: Received a barium swallow test"
 lab var q27k_jp "Q27k. JP only: Received a fecal occult blood test"
@@ -1001,9 +1021,9 @@ lab var q28c_jp "Q28c. JP only: did not get enough explanation on the disease"
 lab var q28d_jp "Q28d. JP only: had to wait a long time"
 
 lab var q29 "Q29. Have you needed medical attention but you did not get it in past 12 months?"
-lab var q29a_ch "Q29a. CH only: Have you needed mental health care, but you did not get it in past 12 months?"
-lab var q29a_ch_other "Q29a. CH only: Main reason you did not receive mental healthcare?"
-lab var q29b_ch "Q29b. CH only: Have you needed care related to your sexual health but you did not get it in past 12 months?"
+lab var q29a_ch_ro "Q29a. CH only: Have you needed mental health care, but you did not get it in past 12 months?"
+lab var q29a_ch_ro_other "Q29a. CH only: Main reason you did not receive mental healthcare?"
+lab var q29b_ch_ro "Q29b. CH only: Have you needed care related to your sexual health but you did not get it in past 12 months?"
 
 lab var q30 "Q30. The last time this happened, what was the main reason?"
 lab var q30_other "Q30. Other"
@@ -1069,7 +1089,8 @@ lab var q38_h "Q38h. How would you rate the amount of time your provider spent w
 lab var q38_i "Q38i. How would you rate the amount of time you waited before being seen?"
 lab var q38_j "Q38j. How would you rate the courtesy and helpfulness at the facility?"
 lab var q38_k "Q38k. How would you rate how long it took for you to get this appointment?"
-lab var q38_l_ch "Q38l. CH only: How would you rate the degree of privacy you had?"
+lab var q38_l_ch_ro "Q38l. CH only: How would you rate the degree of privacy you had?"
+lab var q38_m_ro "Q38m. RO only: How would you rate how well the healthcare provider addressed your health need?"
 
 lab var q39 "Q39. How likely would recommend this facility to a friend or family member?"
 
@@ -1095,12 +1116,12 @@ lab var q41_a "Q41a. How confident are you that you'd get good healthcare if you
 lab var q41_b "Q41b. How confident are you that you'd be able to afford the care you required?"
 lab var q41_c "Q41c. How confident are you that the government considers the public's opinion?"
 lab var q41_us "Q41. US only: In general, how much do you trust the healthcare system as a whole?"
-lab var q41d_ch_de "Q41d. DE only: How confident are you that the health care system addresses the needs of your age group, e.g., by clarifying contraceptive methods available to women of reproductive age?"
+lab var q41d_ch_de_ro "Q41d. DE only: How confident are you that the health care system addresses the needs of your age group, e.g., by clarifying contraceptive methods available to women of reproductive age?"
 lab var q41d_jp "Q41d. JP only: How confident are you that you would be able to afford the healthcare you needed when you are older?"
 lab var q41e_jp "Q41e. JP only: How confident are you that you would be able to get the healthcare you need in case of a natural disaster or emergency?"
 lab var q41f_jp "Q41f. JP only: How confident are you that you would receive good quality healthcare even if you do not live in a city?"
-lab var q41e_ch "Q41e. CH only: How confident are you that you could access prescription contraception if you needed it?"
-lab var q41f_ch "Q41f. CH only:  How confident are you that you could pay for prescription contraception yourself if you needed it?"
+lab var q41e_ch_ro "Q41e. CH only: How confident are you that you could access prescription contraception if you needed it?"
+lab var q41f_ch_ro "Q41f. CH only:  How confident are you that you could pay for prescription contraception yourself if you needed it?"
 
 lab var q42 "Q42. How would you rate the quality of public healthcare system in your country?"
 lab var q43 "Q43. How would you rate the quality of private healthcare?"
@@ -1162,11 +1183,11 @@ lab var q53a_jp "Q53a_jp. JP only: What would be your top priority if you were t
 lab var q53a_jp_other "Q53a_jp_other. Other"
 
 * Additional mental health questions:
-lab var m1_c_ch "M1c. Over past 2 weeks: Feeling nervous, anxious, or on edge"
-lab var m1_d_ch "M1d. Over past 2 weeks: Not being able to stop or control worrying"
-lab var m2_ch "M2. CH only: In the past 12 months, have you discussed your mental health with any health care provider? "
-lab var m3_ch "M3. CH only: Who is the health care provider you mainly went to talk about your mental health? "
-lab var m3_ch_other "M3. CH only: Other health care provider."
+lab var m1_c_ch_ro "M1c. Over past 2 weeks: Feeling nervous, anxious, or on edge"
+lab var m1_d_ch_ro "M1d. Over past 2 weeks: Not being able to stop or control worrying"
+lab var m2_ch_ro "M2. CH only: In the past 12 months, have you discussed your mental health with any health care provider? "
+lab var m3_ch_ro "M3. CH only: Who is the health care provider you mainly went to talk about your mental health? "
+lab var m3_ch_ro_other "M3. CH only: Other health care provider."
 
 
 drop q14 q32 // SS: investigate where this was created
