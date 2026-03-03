@@ -715,13 +715,10 @@ tab Region, m // 1 Refused
 
 * Recoded "other" responses
 gen education = .
-replace education = 0 if q8==24013
-replace education = 1 if q8==24012
-replace education = 1 if q8==24011
+replace education = 1 if q8==24013 | q8==24012 | q8==24011
 replace education = 2 if q8==24008 | q8==24009 | q8==24010
 replace education = 3 if q8==24001 | q8==24002 | q8==24003 | q8==24004 | q8==24005 | q8==24006 | q8==24007
-replace education = 0 if inlist(q8_other, "Keinen Abschluss", "Lebenshilfe") & q8==24014
-replace education = 1 if inlist(q8_other, "Grundschulabschluss", "8.Klasse POS") & q8==24014
+replace education = 1 if inlist(q8_other, "Keinen Abschluss", "Lebenshilfe", "Grundschulabschluss", "8.Klasse POS") & q8==24014
 replace education = 2 if inlist(q8_other, ///
     "Gymnasiale Ausbildung bis zur 10.Klasse", ///
     "Realschule", ///
@@ -730,8 +727,8 @@ replace education = 2 if inlist(q8_other, ///
     "Wirtschaftsschule", ///
     "Realabschluss") & q8==24014
 replace education = 3 if inlist(q8_other, "2.Staatsexamen", "Kreisvolkshochschule") & q8==24014
-replace education = .d if inlist(q8_other, "Berater", "rente") & q8==24014
-label define education 0 "None (or no formal education)" 1 "Primary or less" 2 "Secondary" 3 "Tertiary"
+replace education = 1 if inlist(q8_other, "Berater", "rente") & q8==24014
+label define education 1 "Primary or less" 2 "Secondary" 3 "Tertiary"
 label values education education 
 tab education, m // 0 missing
 
@@ -743,11 +740,9 @@ ipfweight age gender Region education, gen(wgt) ///
 			 3.5 2.2 9.6 0.8 21.6 7.5 4.9 13.4 15.8 1.2 4.3 3.1 1.9 4.9 2.6 2.6 /// region
 			 6.8 47.9 45.5) /// education
 			maxit(50) // max deviation =  percentage points
-		
-
 
 ** Just try to keep data set clean, drop all the variables created above, except wgt
-drop gender age Region education
+drop gender age Region education 
 rename wgt weight
 *------------------------------------------------------------------------------*
 *Reorder variables

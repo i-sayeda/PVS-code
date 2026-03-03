@@ -716,7 +716,7 @@ recode q4b q11_a q17_c q17_d q27i_ch_de q27k_ch_de q40e_ch_de q40h_ch_de q41d_ch
 
 * Switzerland
 recode q3a_ch q3b_ch q4_ch q7a_ch q7b_ch q7c_ch q7d_ch q7e_ch q7f_ch q7g_ch q7h_ch q7i_ch ///
-	   q7j_ch q8a_ch q17f_ch q17g_ch q27i_ch q29a_ch q29b_ch q38_l_ch q41e_ch q41f_ch q50_ch_dk ///
+	   q7j_ch q8a_ch q17f_ch q17g_ch_ro q27i_ch q29a_ch_ro q29b_ch q38_l_ch q41e_ch q41f_ch q50_ch_dk ///
 	   q50a_ch q50b_ch q50c_ch q50d_ch q50f_ch q50h_ch q50i_ch q50j_ch q50k_ch q50l_ch q50m_ch ///
 	   q51a_ch m1_c_ch m1_d_ch m2_ch m3_ch (. = .a) if country !=25
 

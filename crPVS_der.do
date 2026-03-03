@@ -16,7 +16,7 @@
 u "$data_mc/02 recoded data/input data files/pvs_appended_v2.dta", clear
 
 *dropping participants less than 18 years of age:
-drop if q1 <18 // N=122 obs deleted
+drop if q1 <18 // N=434 obs deleted from DE (122), CH (312)
 
 *------------------------------------------------------------------------------*
 ***************************** Derive variable creation
@@ -30,6 +30,7 @@ recode age (.r = 54.5) if q2 == 4
 recode age (.r = 64.5) if q2 == 5
 recode age (.r = 74.5) if q2 == 6
 recode age (.r = 80) if q2 == 7
+recode age (. = .r)
 lab def ref .r "Refused"
 lab val age ref
 
@@ -78,6 +79,7 @@ gen activation = 1 if q12_a == 3 & q12_b == 3
 recode activation (. = 1) if q12_a == 3 & q12_b == .r | q12_a == .r & q12_b == 3 
 recode activation (. = 0) if q12_a < 3 | q12_b < 3 
 recode activation (. = .r) if q12_a == .r & q12_b == .r
+recode activation (. = .r) if inlist(country, 8, 11, 23)
 lab def pa 0 "Not activated" ///
 			1 "Activated (Very confident on q12_a and q12_b)" ///
 			.r "Refused", replace
@@ -99,12 +101,14 @@ recode q16 (2 16 = 1 "Proximity/convenience") ///
 
 * visits
 gen visits = q18_q19
+recode visits (. = .r)
 
 * visits_cat
 gen visits_cat = 0 if q18 == 0 | q19 == 0
 recode visits_cat (. = 1) if q18 >=1 & q18 <= 4 | q19 == 1
 recode visits_cat (. = 2) if q18 > 4 & q18 < . | q19 == 2 | q19 == 3
-recode visits_cat (. = .r) if q18 == .r | q19 == .r
+* recode visits_cat (. = .r) if q18 == .r | q19 == .r
+recode visits_cat (. = .r) 
 lab def visits_cat 0 "Non-user (0 visits)" 1 "Occasional user (1-4 visits)" ///
 			   2 "Frequent user (more than 4)" .r "Refused"
 lab val visits_cat visits_cat
@@ -237,14 +241,18 @@ recode q46 ///
 * Yes/No/Refused - Q11 Q12 Q13 q13 q26 q29 
 
 gen health_chronic = q11
+recode health_chronic (. = .r) if country ==23
+
 gen ever_covid_v1 = q12_v1 
 gen covid_confirmed_v1 = q13_v1 
 gen usual_source = q13
 recode usual_source (.a = 1) if (q13a_la == 1 & inlist(q14_q15a_la,1,2,3,4,6)) | q13b_la == 1
 recode usual_source (.a = 0) if q13a_la == 0 | q13a_la == 1 & q13b_la == 0
 recode usual_source (.a = .r) if q13b_la == .r
+recode usual_source (. = .r) if country==23
 
 gen inpatient = q26 
+recode inpatient (. = .r) if inlist(country, 11, 23)
 gen unmet_need = q29 
 lab val health_chronic usual_source inpatient unmet_need yes_no	
 * blood_pressure mammogram cervical_cancer eyes_exam teeth_exam blood_sugar  
@@ -259,6 +267,21 @@ gen teeth_exam = q27_e
 gen blood_sugar = q27_f 
 gen blood_chol = q27_g
 gen care_mental = q27_h 
+
+recode blood_pressure (. = .r) if country==23
+
+recode mammogram (. = .a) if inlist(country, 2, 7, 10)
+recode mammogram (. = .a) if country==21&gender==0
+recode mammogram (. = .r) if country==21&gender==1
+recode mammogram (. = .r) if country==23&gender==1
+
+recode cervical_cancer (. = .a) if inlist(country, 2, 7, 10)& gender==0
+recode cervical_cancer (. = .r) if country==23&gender==1
+
+recode eyes_exam (. = .r) if country==23
+recode teeth_exam (. = .r) if country==23
+recode blood_sugar (. = .r) if country==23
+recode blood_chol (. = .r) if country==23
 
 gen hiv_test = q27i_za
 recode hiv_test (. = .a) if country !=9 | country==9&wave==2
@@ -294,6 +317,11 @@ recode electrocardiogram (. = .a) if country !=8
 *gen = q27i_gr_in_ro
 
 gen mistake = q28_a
+
+recode mistake (. = .r) if inlist(country, 8, 23)
+recode discrim (. = .r) if inlist(country, 8, 23)
+recode unmet_need (. = .r) if country==23
+
 gen discrim = q28_b
 lab val blood_pressure mammogram cervical_cancer eyes_exam teeth_exam /// 
 	blood_sugar blood_chol hiv_test care_srh care_mental mistake discrim endoscope barium_test fecal_blood electrocardiogram yes_no_dk
@@ -310,7 +338,7 @@ replace	health_vge = 0 if q9 == 0 | q9 == 1 | q9 == 2 & country == 23
 replace	health_vge = 1 if q9 == 3 | q9 == 4 & country == 23	   
 
 recode q10 (0 1 2 = 0 "Poor/Fair/Good") (3 4 = 1 "Very good/Excellent") (.r = .r "Refused") /// 
-	   (.a = .a "NA"), /// 
+	   (.a = .a "NA") (. = .r "Refused"), /// 
 	   gen(health_mental_vge) label(health_mental2)
 	   
 replace	health_mental_vge = 0 if q10 == 0 | q10 == 1 | q10 == 2 & country == 23
@@ -322,6 +350,7 @@ recode q17 (0 1 2 = 0 "Poor/Fair/Good") (3 4 = 1 "Very good/Excellent") (.r = .r
 
 replace	usual_quality_vge = 0 if q17 == 0 | q17 == 1 | q17 == 2 & country == 23
 replace	usual_quality_vge = 1 if q17 == 3 | q17 == 4 & country == 23	
+recode usual_quality_vge (. = .r) if inlist(country, 8, 23)
 	   
 recode q38_a (0 1 2 = 0 "Poor/Fair/Good") (3 4 = 1 "Very good/Excellent") (.r = .r "Refused") /// 
 	   (.a = .a "NA"), /// 
@@ -544,32 +573,36 @@ lab val insured yes_no
 * insur_type 
 
 recode q7 ///
-    (2017 2018 2003 2012 2013 2018 3001 5003 2017 2018 7010 7004 10019 11002 12002 12003 ///
-     12005 12006 16001 4023 4024 4025 4026 17002 2030 18029 19031 20034 20037 21001 21002 ///
-     21003 21005 22002 10005 10019 2001 23002 23003 23004 24001 = 0 "Public") ///
-    (1004 1005 2028 2010 2011 3002 5004 5005 5006 3007 2028 7013 7015 10021 11001 12001 ///
-     12004 13005 16005 4027 17001 18004 18030 19032 19033 19034 20035 20036 21004 22001 ///
-     22003 22004 10016 10017 23001 6001 6003 24002 24003 = 1 "Private") ///
-    (1001 1002 1003 2015 2016 2006 2007 16002 16003 16004 13001 13002 13004 7011 7012 ///
-     7008 7019 10022 = 2 "Social security/military") ///
+    (2001 2003 2012 2013 2017 2018 3001 4023 4024 4025 4026 5003 7004 7010 ///
+     10005 10019 12002 12003 12005 12006 16001 18029 19031 20034 20037 21001 21002 ///
+     21003 21005 22002 23002 23003 23004 24001 = 0 "Public") ///
+    (1004 1005 2028 2010 2011 3002 3007 4027 5004 5005 5006 6001 6003 7013 7015 9008 9009 9995 9997 ///
+     10021 10016 10017 12001 12004 13005 16005 18004 18030 19032 19033 19034 20035 20036 21004 22001 ///
+     22003 22004 23001 24002 24003 = 1 "Private") ///
+    (1001 1002 1003 2015 2016 2006 2007 7011 7012 7008 7019 ///
+     10022 13001 13002 13004 16002 16003 16004 = 2 "Social security/military") ///
     (1006 2995 2020 12995 12007 13995 4995 18995 19995 20995 21006 7021 10009 10020 5997 ///
      23005 6002 24005 = 3 "Other") ///
     (.r = .r "Refused") ///
-    (2030 7014 13014 16007 13003 7002 10001 1000 8001 8002 11001 11002 14001 14002 17001 ///
-     17002 24004 = .a "NA"), ///
+    (2030 7014 13014 16007 13003 7002 10001 1000 14001 14002 24004 = .a "NA"), ///
     gen(insur_type) //SS: confirm placement of 1000
 
+/* 03-03-2026 LW: Muted for now but kept for recored just in case
 recode insur_type (.a = 0) if q6_za == 1 & !inlist(q7, 9008, 9009, 9995, 9997)
 recode insur_type (0 = .a) if q6_za == 0 | q6_za == .r
 recode insur_type (.r = 0) if q6_za == 1
 
 replace insur_type = .a if country == 9
 recode insur_type (.a = 1) if q6_za == 1
+*/
+
+replace insur_type = .a if inlist(country, 8, 11, 14, 15, 17, 25) //LW: here just to make sure the countries that have universal coverage systems are ".a"
+
+recode insur_type (. = .a) if q7 == . & inlist(country, 2, 7, 10, 23) //LW: here just to make sure all "." goes to the right categories
 
 * insur_type_universal
 recode q7 (8002 11002 17002 = 0 "Public only") ///
 		  (8001 11001 17001 = 1 "Public and supplemental private") /// 
-		  (24005 = 3 "Other") ///
 		  (.r = .r "Refused") (.a  = .a "NA"), gen(insur_type_universal)
 
 recode insur_type_universal (.a = 1) if q7_kr == 1
@@ -578,12 +611,12 @@ recode insur_type_universal (.a = 0) if q7_kr == 0
 recode insur_type_universal (.a = 1) if q6_it == 1
 recode insur_type_universal (.a = 0) if q6_it == 0
 
-replace insur_type_universal = .a if !inlist(country, 8, 11, 14, 15, 17)
+recode insur_type_universal (. = .a) if q7 ==. & inlist(country, 11, 25) // just to clean up the "."
 
 *Swiss updates to insur_type_universal (SS: ask for code review, this question was a multi-checkbox field so one participant could've checked multiple answers)
-recode insur_type_universal (.a = 0) if q7i_ch == 1
+recode insur_type_universal (. = 0) if q7i_ch == 1
 
-recode insur_type_universal (.a = 1) if q7a_ch ==1 | /// Suppl dental ins.
+recode insur_type_universal (. = 1) if q7a_ch ==1 | /// Suppl dental ins.
 										 q7b_ch ==1 | /// Suppl hosp. ins.
 										 q7c_ch ==1 | /// Suppl pharmacy ins.
 										 q7d_ch ==1 | /// Suppl alternative med. ins.
@@ -591,7 +624,7 @@ recode insur_type_universal (.a = 1) if q7a_ch ==1 | /// Suppl dental ins.
 										 q7f_ch ==1 | /// Suppl ins. for sport and wellness
 										 q7g_ch ==1 // Suppl health ins. for travel
 										 
-recode insur_type_universal (.a = .r) if q7a_ch !=1 & q7b_ch !=1 & ///
+recode insur_type_universal (. = .r) if q7a_ch !=1 & q7b_ch !=1 & ///
 										 q7c_ch !=1 & q7d_ch !=1 & q7e_ch!=1 & ///
 										 q7f_ch !=1 & q7g_ch !=1 & q7h_ch !=1 & q7i_ch !=1 & ///
 										 q7j_ch == 1 // confirm this, especially the addition of "other here", essentially just trying to select the people who said yes only to "don't know/prefer not to answer"
@@ -599,19 +632,7 @@ recode insur_type_universal (.a = .r) if q7a_ch !=1 & q7b_ch !=1 & ///
 *removing these from finalized dataset (confirm if they should be kept in)
 drop q7a_ch q7b_ch q7c_ch q7d_ch q7e_ch q7f_ch q7g_ch q7h_ch q7i_ch q7j_ch
 			
-* Ask Liwei to confirm this section of code
-/* Variable for countries with universal public coverage + supplemental private coverage
-gen insur_type_universal = .
-	replace insur_type_universal = 0 if insur_type<.
-	replace insur_type_universal = 1 if insur_type==1
-	
-replace insur_type_universal = .a if !inlist(country, 8, 11, 14, 15, 17, 24)
-	
-label define insur_univ_lbl 0 "Public only" 1 "Public + private"
-label values insur_type_universal insur_univ_lbl
-
-* Removing insur_type for countries using insur_type_universal
-replace insur_type = .a if inlist(country, 8, 11, 14, 15, 17, 24)*/
+replace insur_type_universal = .a if !inlist(country, 8, 11, 14, 15, 17, 25) //LW: here just to make sure the countries that don't have universal coverage systems are ".a"
 
 * education
 recode q8 (1001 1002 3001 3002 5007 9012 9013 2025 2026 7018 7019 10032 10033 11001 13001 ///
@@ -621,7 +642,7 @@ recode q8 (1001 1002 3001 3002 5007 9012 9013 2025 2026 7018 7019 10032 10033 11
           (1003 3003 5008 8001 9014 9015 2027 7020 10034 11002 13002 14002 12002 12003 ///
 		   15002 16003 4040 17002 18046 19053 20059 21003 21004 22003 22004 ///
 		   2003 7003 10002 10003 23002 23003 6002 24012 = 1 "Primary") ///
-		   (1004 3004 5009 9016 2028 7021 8002 10035 11003 11004 14004 14005 13003 13004 12004 ///
+		   (1004 3004 5009 9016 2028 7021 8002 10035 11003 11004 14003 14004 14005 13003 13004 12004 ///
 		   15003 15004 16004 4041 17003 18047 19054 19055 20060 21005 21006 ///
 		   22005 2004 7004 10004 23004 23005 23009 6003 24002 24003 24004 24005 24006 24007 24008 24009 24010 24011 25003 25004 = 2 "Secondary") ///
           (1005 1006 1007 3005 5010 5011 9017 2029 2030 2031 7022 7023 7024 8003 8004 8005 10036 10037 10038 11005 ///
@@ -630,7 +651,7 @@ recode q8 (1001 1002 3001 3002 5007 9012 9013 2025 2026 7018 7019 10032 10033 11
 		   20062 21007 21008 21009 21010 22006 2005 2006 2007 7005 7006 7007 10005 ///
 		   10006 10007 23006 23007 23008 6004 24001 25005 25006 25007 = 3 "Post-secondary") ///
 		   (24014 = 4 "Other") ///
-          (.r = .r "Refused"), gen(education)
+          (.r = .r "Refused") (. = .r "Refused") (.a  = .a "NA"), gen(education)
 
 * usual_type_own	  
 recode q14_multi (1 = 0 "Public") (2 3 = 1 "Private") (4 = 2 "Other") /// 
@@ -775,6 +796,7 @@ recode usual_type_lvl (. = 0) if q15a_so == 2 | q15a_so == 3 | q15b_so == 2 | q1
 
 recode usual_type_lvl (. = 1) if q15a_so == 1 | q15b_so == 1 | q15c_so  == 5 | q15c_so == 7
 recode usual_type_lvl (. = .a) if insured == 0 & country == 22
+recode usual_type_lvl (. = .a) if inlist(country, 2, 6, 7, 10, 17, 22, 23)
 		   
 * usual_type - ownership and level 
 gen usual_type = . 
@@ -1162,6 +1184,7 @@ replace strata = "Malawi_F2F" if country==6 & mode==2
 *********************************9-20 SS: adding back variables for PVS dashboard:
 gen health = q9 
 gen health_mental = q10 
+recode health_mental (. = .r) if country==23
 gen last_qual = q38_a 
 gen last_skills = q38_b 
 gen last_supplies = q38_c 
@@ -1179,6 +1202,7 @@ vignette_good exc_poor
 	   
 gen usual_quality = q17
 recode usual_quality (5 = .a)
+recode usual_quality (. = .r) if inlist(country, 8, 23)
 gen last_know = q38_e
 gen last_courtesy = q38_j
 lab val usual_quality exc_pr_hlthcare
@@ -1239,6 +1263,11 @@ recode q25 (0 = 0 "Poor") (1 = 1 "Fair") (2 = 2 "Good") (3 = 3 "Very Good") (4 =
 *last_sched
 recode q35 (0 = 0 "No") (1 = 1 "Yes") ///
 		   (.a = .a "NA") (.r = .r "Refused"), gen(last_sched)
+		   
+*********************************03-02-2026 LW: normalize weight for DE and CH
+* recommend doing here because the reference from census dataset usually includes age under 18 
+bysort country: egen mean_wgt = mean(weight)
+replace weight = weight / mean_wgt if inlist(country, 25, 24)
 
 *****************************
 
