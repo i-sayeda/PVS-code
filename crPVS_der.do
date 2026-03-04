@@ -254,6 +254,7 @@ recode usual_source (. = .r) if country==23
 gen inpatient = q26 
 recode inpatient (. = .r) if inlist(country, 11, 23)
 gen unmet_need = q29 
+recode unmet_need (. = .r) if country==23
 lab val health_chronic usual_source inpatient unmet_need yes_no	
 * blood_pressure mammogram cervical_cancer eyes_exam teeth_exam blood_sugar  
 * blood_chol care_mental 
@@ -317,12 +318,10 @@ recode electrocardiogram (. = .a) if country !=8
 *gen = q27i_gr_in_ro
 
 gen mistake = q28_a
-
 recode mistake (. = .r) if inlist(country, 8, 23)
-recode discrim (. = .r) if inlist(country, 8, 23)
-recode unmet_need (. = .r) if country==23
 
 gen discrim = q28_b
+recode discrim (. = .r) if inlist(country, 8, 23)
 lab val blood_pressure mammogram cervical_cancer eyes_exam teeth_exam /// 
 	blood_sugar blood_chol hiv_test care_srh care_mental mistake discrim endoscope barium_test fecal_blood electrocardiogram yes_no_dk
 lab val mistake discrim yes_no_na
