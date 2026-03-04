@@ -169,6 +169,8 @@ recode q34 (1 = 1 "Urgent or new problem") (2 = 2 "Follow-up for chronic disease
 		   (3 = 3 "Preventative or health check") (4 5 6 7 8 9 10 11 12 13 = 4 "Other") (.a = .a "NA") ///
 		   (.r = .r "Refused"), gen(last_reason)
 
+recode last_reason (. = .r) if country==4
+
 *last_wait_time
 * SS: updated 4-15-25 with V2.0 var 
 gen last_wait_time = 0 if q37_v1 <= 15
@@ -177,7 +179,7 @@ recode last_wait_time (. = 2) if q37_v1 >= 60 & q37_v1 < .
 recode last_wait_time (. = .a) if q37_v1 == .a
 recode last_wait_time (. = .r) if q37_v1 == .r
 lab def lwt 0 "Short (15 minutes)" 1 "Moderate (< 1 hour)" 2 "Long (>= 1 hour)" ///
-			.r "Refused" .a "NA"
+			.r "Refused" .a "NA" .d "Don't know"
 lab val last_wait_time lwt
 
 recode last_wait_time (. = 0) if q37 == 1
@@ -185,6 +187,7 @@ recode last_wait_time (. = 1) if q37 == 2 | q37 == 3
 recode last_wait_time (. = 2) if q37 == 4 | q37 == 5 | q37 == 6 | q37 == 7
 recode last_wait_time (. = .a) if q37 == .a
 recode last_wait_time (. = .r) if q37 == .r
+recode last_wait_time (. = .d) if country==19
 
 *last_sched_time
 * SS: updated 4-15-25 with V2.0 var: same or next day, 2 days to 1 week, and greater than one week
@@ -937,6 +940,13 @@ recode last_type_lvl (.a = 1) if q33a_gr == 3 | q33a_gr == 4 | q33a_gr == 6
 * Somaliland recode
 recode last_type_lvl (.a = 0) if q33a_gr == 1 | q33a_gr == 2
 recode last_type_lvl (.a = 1) if q33a_gr == 3 | q33a_gr == 4 | q33a_gr == 6
+
+* 03-04-2026 LX: missingness recode, already checking using q18 and q19
+recode last_type_lvl (. = .r) if inlist(country,2,4,7,10)
+recode last_type_lvl (. = .a) if inlist(country,8,17)
+recode last_type_lvl (. = .r) if country==3&q18==2
+recode last_type_lvl (. = .d) if country==3&q18==.d
+
 		      
 * last_type - ownership and level
 gen last_type = . 
