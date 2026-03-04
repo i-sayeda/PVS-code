@@ -446,11 +446,15 @@ drop q30
 label copy q70 q35_label
 label copy q71 q36_label
 label copy q72 q37_label
-label copy q94 q45_label
 lab val q35 q35_label
 lab val q36 q36_label
 lab val q37 q37_label
+
+
+recode q45 (3 = 0) (2 = 1) (1 = 2)
+lab def q45_label 0 "Getting worse" 1 "Staying the same" 2 "Getting better" 
 lab val q45 q45_label
+
 
 lab define q46_label 1 "Our healthcare system has so much wrong with it that we need to completely rebuild it." ///
 	2 "There are some good things in our healthcare system, but major changes are needed to make it work better." ///
