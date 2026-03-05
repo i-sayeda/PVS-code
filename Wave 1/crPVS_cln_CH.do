@@ -464,7 +464,7 @@ lab values reclanguage Language
 local q4l labels225
 local q5l labels6
 *local q7l labels7
-local q8l labels29
+local q8l labels230
 local q15l labels75 
 local q33l labels174 
 local q51l labels218 
@@ -552,6 +552,8 @@ recode q5 q8 q51a_ch q9 q10 m1_a m1_b m1_c_ch_ro m1_d_ch_ro q11 q11_a q12_a q12_
 	   q35 q36 q37 q38_a q38_b q38_c q38_d q38_f q38_g q38_h q38_i q38_k q38_l_ch_ro ///
 	   q38_e q38_j q39 q40_a q40_b q40_c q40_d q40e_ch_de  q40h_ch_de q41_a q41_b ///
 	   q41_c q41d_ch_de_ro q41e_ch_ro q42 q45 q46 q51 q51a q3b_ch (999 = .r)	
+	   
+recode q8 (25099 = .d)
 
 recode q8a_ch q8 q8a_ch (777 = .r) 
 	   
@@ -900,6 +902,7 @@ ren q34_other_original q34_other
 ren q3a_ch_other_original q3a_ch_other
 ren q50j_ch_other_original q50j_ch_other
 ren m3_ch_other_original m3_ch_other            
+
 
 *------------------------------------------------------------------------------*/
 
