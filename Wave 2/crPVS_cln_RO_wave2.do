@@ -375,6 +375,23 @@ replace q38_j = .a if q38_j == 6  // I have not had prior visits or tests or The
 recode q36 q38_i q38_k (. = .a) if q35 !=1
 
 *------------------------------------------------------------------------------*
+
+* Other specify recode 
+* This command recodes all "other specify" variables as listed in /specifyrecode_inputs spreadsheet
+* This command requires an input file that lists all the variables to be recoded and their new values
+* The command in data quality checks below extracts other, specify values 
+
+
+foreach i in 19 {
+
+ipacheckspecifyrecode using "$in_out/Input/specifyrecode_inputs/specifyrecode_inputs_`i'.xlsx",	///
+	sheet(other_specify_recode)							///	
+	id(respondent_id)	
+ 
+}	
+
+*------------------------------------------------------------------------------*/
+
 * Recode values and value labels:
 * Recode values and value labels so that their values and direction make sense:
 
@@ -443,14 +460,27 @@ recode q30 (4 = 1 "High cost (e.g., high out of pocket payment, not covered by i
 		   (.a = .a "NA") (.d = .d "Don't know") (.r = .r "Refused"), pre(rec) label(q30_label)
 drop q30
 
+recode q45 (3 = 0) ///
+           (2 = 1) ///
+           (1 = 2)
+
+label define q45_label 0 "Getting worse" ///
+                      1 "Staying the same" ///
+                      2 "Getting better"
+lab val q45 q45_label
+
 label copy q70 q35_label
 label copy q71 q36_label
 label copy q72 q37_label
-label copy q94 q45_label
 lab val q35 q35_label
 lab val q36 q36_label
 lab val q37 q37_label
+
+
+recode q45 (3 = 0) (2 = 1) (1 = 2)
+lab def q45_label 0 "Getting worse" 1 "Staying the same" 2 "Getting better" 
 lab val q45 q45_label
+
 
 lab define q46_label 1 "Our healthcare system has so much wrong with it that we need to completely rebuild it." ///
 	2 "There are some good things in our healthcare system, but major changes are needed to make it work better." ///
@@ -513,7 +543,7 @@ label define q40_label .a "NA" .d "I am unable to judge" .r "Refused",modify
 label define q45_label .a "NA" .d "Don't know" .r "Refused",modify
 label define m3_ch_ro_label 4 "Phone-based service" 5 "Online-based service",modify
 
-label drop q13 health5 q18 mediu educ varstac sex q99 q98 q97 q95 q94 q90 q72 q71 q70 q69 q62 agree5 q56 q55 q51 q40 q39 q37 q36 q34 q30 frequency3 health5dk q10 q9 mentioned yesno_r q5 recq4 q7_cost recq30 
+label drop q13 health5 q18 q97 q95 q94 q72 q71 q70 q69 health5dk yesno_r recq30 
 
 *------------------------------------------------------------------------------*
 * Renaming variables 
@@ -536,73 +566,6 @@ label val q51 q51_label2
 label drop q4_label q5_label q15_label q33_label q50_label q51_label
 
 *------------------------------------------------------------------------------*
-
-* Other specify recode 
-* This command recodes all "other specify" variables as listed in /specifyrecode_inputs spreadsheet
-* This command requires an input file that lists all the variables to be recoded and their new values
-* The command in data quality checks below extracts other, specify values 
-/*
-
-gen q7_other_original = q7_other
-label var q7_other_original "Q7_other. Other"
-	
-gen q15_other_original = q15_other
-label var q15_other_original "Q15. Other"
-
-gen q16_other_original = q16_other
-label var q16_other_original "Q16. Other"
-
-gen q24_other_original = q24_other
-label var q24_other_original "Q24. Other"
-
-gen q30_other_original = q30_other
-label var q30_other_original "Q30. Other"
-
-gen q33_other_original = q33_other
-label var q33_other_original "Q33. Other"
-	
-gen q34_other_original = q34_other
-label var q34_other_original "Q34. Other"	
-
-gen q50_other_original = q50_other 
-label var q50_other_original "Q50. Other"	
-	
-gen q52a_us_other_original = q52a_us_other 
-label var q52a_us_other_original "Q52a. Other"	
-
-gen m2_i_other_original = m2_i_other 
-label var m2_i_other_original "M2_i. Other"	
-
-gen m6_j_other_original = m6_j_other 
-label var m6_j_other_original "M6_j. Other"	
-
-/*
-foreach i in 19 {
-
-ipacheckspecifyrecode using "$in_out/Input/specifyrecode_inputs/specifyrecode_inputs_`i'.xlsx",	///
-	sheet(other_specify_recode)							///	
-	id(respondent_id)	
- 
-}	
-
-*/
-
-drop q7_other q15_other q16_other q24_other q30_other q33_other q34_other q37_other ///
-	 q50_other q52a_us_other m2_i_other m6_j_other
-	 
-ren q7_other_original q7_other
-ren q15_other_original q15_other
-ren q16_other_original q16_other
-ren q24_other_original q24_other
-ren q30_other_original q30_other
-ren q33_other_original q33_other
-ren q34_other_original q34_other
-ren q50_other_original q50_other
-ren q52a_us_other_original q52a_us_other
-ren m2_i_other_original m2_i_other
-ren m6_j_other_original m6_j_other
-
-*------------------------------------------------------------------------------*/
 
 * Reorder variables
 	order m1_a m1_b m1_c_ch_ro m1_d_ch_ro m2_ch_ro m3_ch_ro m3_ch_ro_other
