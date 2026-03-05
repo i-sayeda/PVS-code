@@ -41,7 +41,7 @@ drop F131_5 // labeled 'age' with largely missing values and 'Y/N' responses
 	drop F131_6 // similar issue with 'gender'
 	
 	* true drops:
-	drop RecordNo F180_1 F180_2 F180_3 F180_4 A1 F085 _v1 // confirm _v1
+	drop RecordNo F180_1 F180_2 F180_3 F180_4 A1 F085 
 	drop F003 S00 S003 hparents // consent questions?
 	drop GeoPC_group_region_ch_3way // recode from postcodech for LINK regional 3 way matching on region and language
 
@@ -163,7 +163,26 @@ rename F019_9 q7i_ch
 rename F019_opn q7_ch_other 
 rename F019_999 q7j_ch
 
-rename F031 q8
+****
+*Education asked in two steps pending whether someone is pursuing education currently*
+*Education back coded using both variables*
+
+* Create combined variable, starting with _v1
+clonevar edu_highest = _v1
+
+* Fill in missing using F031
+replace edu_highest = 1  if missing(_v1) & F031 == 3
+replace edu_highest = 3  if missing(_v1) & F031 == 4
+replace edu_highest = 6  if missing(_v1) & F031 == 5
+replace edu_highest = 6  if missing(_v1) & F031 == 6
+replace edu_highest = 10 if missing(_v1) & F031 == 7
+replace edu_highest = 99 if missing(_v1) & F031 == 999
+
+tab edu_highest, m
+
+****
+
+rename edu_highest q8
 rename F034 q9
 rename F035 q10
 rename F052 q11
@@ -899,7 +918,24 @@ ren q33_other_original q33_other
 ren q34_other_original q34_other
 ren q3a_ch_other_original q3a_ch_other
 ren q50j_ch_other_original q50j_ch_other
-ren m3_ch_other_original m3_ch_other            
+ren m3_ch_other_original m3_ch_other    
+
+* Fixing value labels for combined education variable *
+ 
+label define q8_label2 25001 "None" ///
+    25002 "Compulsory school" ///
+    25003 "Lower secondary education" ///
+    25004 "Upper secondary education" ///
+    25005 "Higher vocational education or some university studies" ///
+    25006 "University degree or equivalent" ///
+    25007 "Postgraduate degree" ///
+    25008 "Professional certificate, federal diploma" ///
+    25009 "Higher technical college" ///
+    25010 "Bachelor's degree" ///
+    25011 "Master's degree, licentiate, diploma" ///
+    25012 "Doctorate, habilitation" ///
+    25099 "Do not know / no answer", replace
+label values q8 q8_label2
 
 *------------------------------------------------------------------------------*/
 
