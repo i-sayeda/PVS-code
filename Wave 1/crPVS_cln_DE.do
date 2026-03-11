@@ -498,6 +498,7 @@ recode q16 (1 = 1 "Low cost") (2 = 2 "Short distance") (3 = 3 "Short waiting tim
 (9 = 17 "DE: My parents chose this doctor's office or health care facility for me") (10 = 18 "DE: This doctor's office or health care facility is child-friendly/youth-friendly") (11 = 9 "Other, specify") ///
 (.a = .a "NA") (.d = .d "Don't know") (.r = .r "Refused"), ///
 pre(rec) label(q16_label)
+label define q16_label 13 "Recommended by family or friends" 14 "Trust hospital" 19 "Patient loyalty", add
 
 recode q19 (1 = 0 "0") (2 = 1 "1-4") (3 = 2 "5-9") (4 = 3 "10 or more") (.a = .a "NA") ///
 		   (.d = .d "Don't know") (.r = .r "Refused"), pre(rec) label(q19_label)
@@ -715,13 +716,10 @@ tab Region, m // 1 Refused
 
 * Recoded "other" responses
 gen education = .
-replace education = 0 if q8==24013
-replace education = 1 if q8==24012
-replace education = 1 if q8==24011
+replace education = 1 if q8==24013 | q8==24012 | q8==24011
 replace education = 2 if q8==24008 | q8==24009 | q8==24010
 replace education = 3 if q8==24001 | q8==24002 | q8==24003 | q8==24004 | q8==24005 | q8==24006 | q8==24007
-replace education = 0 if inlist(q8_other, "Keinen Abschluss", "Lebenshilfe") & q8==24014
-replace education = 1 if inlist(q8_other, "Grundschulabschluss", "8.Klasse POS") & q8==24014
+replace education = 1 if inlist(q8_other, "Keinen Abschluss", "Lebenshilfe", "Grundschulabschluss", "8.Klasse POS") & q8==24014
 replace education = 2 if inlist(q8_other, ///
     "Gymnasiale Ausbildung bis zur 10.Klasse", ///
     "Realschule", ///
@@ -730,8 +728,8 @@ replace education = 2 if inlist(q8_other, ///
     "Wirtschaftsschule", ///
     "Realabschluss") & q8==24014
 replace education = 3 if inlist(q8_other, "2.Staatsexamen", "Kreisvolkshochschule") & q8==24014
-replace education = .d if inlist(q8_other, "Berater", "rente") & q8==24014
-label define education 0 "None (or no formal education)" 1 "Primary or less" 2 "Secondary" 3 "Tertiary"
+replace education = 1 if inlist(q8_other, "Berater", "rente") & q8==24014
+label define education 1 "Primary or less" 2 "Secondary" 3 "Tertiary"
 label values education education 
 tab education, m // 0 missing
 
@@ -743,81 +741,14 @@ ipfweight age gender Region education, gen(wgt) ///
 			 3.5 2.2 9.6 0.8 21.6 7.5 4.9 13.4 15.8 1.2 4.3 3.1 1.9 4.9 2.6 2.6 /// region
 			 0.1 6.8 47.9 45.5) /// education
 			maxit(50) // max deviation =  percentage points
-		
-
 
 ** Just try to keep data set clean, drop all the variables created above, except wgt
-drop gender age Region education
+drop gender age Region education 
 rename wgt weight
 *------------------------------------------------------------------------------*
 *Reorder variables
 order q*, sequential
 order respondent_serial respondent_id date int_length mode country wave language weight
-
-*------------------------------------------------------------------------------*
-
-/* Other specify recode 
-* This command recodes all "other specify" variables as listed in /specifyrecode_inputs spreadsheet
-* This command requires an input file that lists all the variables to be recoded and their new values
-* The command in data quality checks below extracts other, specify values 
-
-gen q7_other_original = q7_other
-label var q7_other_original "Q7_other. Other"
-
-gen q14_other_original = q14_other
-label var q14_other_original "Q14_other. Other"
-	
-gen q15_other_original = q15_other
-label var q15_other_original "Q15. Other"
-
-gen q16_other_original = q16_other
-label var q16_other_original "Q16. Other"
-
-gen q24_other_original = q24_other
-label var q24_other_original "Q24. Other"
-
-gen q30_other_original = q30_other
-label var q30_other_original "Q30. Other"
-
-gen q32_other_original = q32_other
-label var q32_other_original "Q32. Other"
-
-gen q33_other_original = q33_other
-label var q33_other_original "Q33. Other"
-	
-gen q34_other_original = q34_other
-label var q34_other_original "Q34. Other"	
-
-gen q50_other_original = q50_other
-label var q50_other_original "Q50. Other"	
-
-
-foreach i in 3 4 5 9 {
-
-ipacheckspecifyrecode using "$in_out/Input/specifyrecode_inputs/specifyrecode_inputs_`i'.xlsm",	///
-	sheet(other_specify_recode)							///	
-	id(respondent_id)	
- 
-}	
-
-drop q7_other q14_other q15_other q16_other q24_other q30_other q32_other ///
-	 q33_other q34_other q50_other
-	 
-ren q7_other_original q7_other
-ren q14_other_original q14_other
-ren q15_other_original q15_other
-ren q16_other_original q16_other
-ren q24_other_original q24_other
-ren q30_other_original q30_other
-ren q32_other_original q32_other
-ren q33_other_original q33_other
-ren q34_other_original q34_other
-ren q50_other_original q50_other
-
-order q*, sequential
-order respondent_serial respondent_id mode country language date time int_length weight_educ
-
-*------------------------------------------------------------------------------*/
 
 *------------------------------------------------------------------------------*
 * Label variables - double check matches the instrument					
@@ -941,6 +872,80 @@ label var q49 "Q49. How would you rate the quality of care provided? (Vignette, 
 label var q50 "Q50. What is your native language or mother tongue?"
 label var q50_other "Q50. Other"
 label var q51 "Q51. Total monthly household income"
+
+*------------------------------------------------------------------------------*
+
+*------------------------------------------------------------------------------*
+
+* Other specify recode 
+* This command recodes all "other specify" variables as listed in /specifyrecode_inputs spreadsheet
+* This command requires an input file that lists all the variables to be recoded and their new values
+* The command in data quality checks below extracts other, specify values 
+
+gen q8_other_original = q8_other
+label var q8_other_original "Q8. Other"
+
+gen q14_other_original = q14_other
+label var q14_other_original "Q14. Other"
+
+gen q15_other_original = q15_other
+label var q15_other_original "Q15. Other"
+
+gen q15a_de_other_original = q15a_de_other
+label var q15a_de_other_original "Q15a_de. Other"
+
+gen q16_other_original = q16_other
+label var q16_other_original "Q16. Other"
+
+gen q24_other_original = q24_other
+label var q24_other_original "Q24. Other"
+
+gen q30_other_original = q30_other
+label var q30_other_original "Q30. Other"
+
+gen q32_other_original = q32_other
+label var q32_other_original "Q32. Other"
+
+gen q33_other_original = q33_other
+label var q33_other_original "Q33. Other"
+
+gen q34_other_original = q34_other
+label var q34_other_original "Q34. Other"
+
+gen q37_other_original = q37_other
+label var q37_other_original "Q37. Other"
+
+gen q50_other_original = q50_other
+label var q50_other_original "Q50. Other"
+
+
+foreach i in 24 {
+
+ipacheckspecifyrecode using "$in_out/Input/specifyrecode_inputs/specifyrecode_inputs_`i'.xlsx",	///
+	sheet(other_specify_recode)							///	
+	id(respondent_id)	
+ 
+}	
+
+drop q8_other q14_other q15_other q15a_de_other q16_other q24_other q30_other q32_other ///
+	 q33_other q34_other q37_other q50_other
+	 
+ren q8_other_original q8_other
+ren q14_other_original q14_other
+ren q15_other_original q15_other
+ren q15a_de_other_original q15a_de_other
+ren q16_other_original q16_other
+ren q24_other_original q24_other
+ren q30_other_original q30_other
+ren q32_other_original q32_other
+ren q33_other_original q33_other
+ren q34_other_original q34_other
+ren q37_other_original q37_other
+ren q50_other_original q50_other
+
+order q*, sequential
+* order respondent_serial respondent_id mode country language date int_length weight_educ time
+order respondent_serial respondent_id mode country language date int_length
 
 *------------------------------------------------------------------------------*
 * Save data

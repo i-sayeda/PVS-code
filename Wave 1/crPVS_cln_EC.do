@@ -114,7 +114,7 @@ drop p36
 
 * Generate variables
 
-*gen respondent_id = "EC" + string(respondent_serial)
+gen respondent_id = "EC" + string(respondent_serial)
 *drop respondent_serial
 
 gen country = 1
@@ -920,7 +920,7 @@ rename wgt weight
 
 *Reorder variables
 order q*, sequential
-order respondent_serial country wave language mode weight
+order respondent_serial respondent_id country wave language mode weight
 *------------------------------------------------------------------------------*
 * Save data
 
