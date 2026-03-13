@@ -95,7 +95,7 @@ recode q16 (2 16 = 1 "Proximity/convenience") ///
            (7 = 7 "Only facility available") ///
            (11 13 21 = 8 "Recommended by others") ///
            (15 17 23 = 9 "Chosen by family") ///
-           (12 = 10 "Provider referral") ///
+           (12 20 = 10 "Provider referral") ///
            (.r . 9 18 19 997 = .r "Other or Refused") ///
            (.a = .a "NA") , gen(usual_reason)
 
@@ -603,8 +603,8 @@ replace insur_type = .a if inlist(country, 8, 11, 14, 15, 17, 25) //LW: here jus
 recode insur_type (. = .a) if q7 == . & inlist(country, 2, 7, 10, 23) //LW: here just to make sure all "." goes to the right categories
 
 * insur_type_universal
-recode q7 (8002 11002 17002 = 0 "Public only") ///
-		  (8001 11001 17001 = 1 "Public and supplemental private") /// 
+recode q7 (8002 11002 17002 = 0 "Public or mandatory private") ///
+		  (8001 11001 17001 = 1 "Supplemental private") /// 
 		  (.r = .r "Refused") (.a  = .a "NA"), gen(insur_type_universal)
 
 recode insur_type_universal (.a = 1) if q7_kr == 1
@@ -914,6 +914,9 @@ recode last_type_own (.a = .r) if q32_uy == .r | q32_it == .r | q32_mx == .r | /
 								  q32a_gr == .r | q32_de == .r
 								  
 recode last_type_own (.a = .d) if q32_de == .d
+
+* Recode last_type_own where repondents have no in-person visits
+replace last_type_own = .a if q18_q19 == 0 & last_type_own != .a
 								  
 							  
 * last type level							  
