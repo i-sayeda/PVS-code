@@ -241,15 +241,15 @@ replace recq18 = .r if q18 == .r
 label values recq18
 
 gen q19 = .
-replace q19 = 0 if q18 == 0
-replace q19 = 1 if q18 > 0 & q18 <= 4
-replace q19 = 2 if q18 >= 5 & q18 <= 9
-replace q19 = 3 if q18 >= 10 & q18 < .
-replace q19 = .d if q18 == .d
-replace q19 = .r if q18 == .r
+replace q19 = 0 if recq18 == 0
+replace q19 = 1 if recq18 > 0 & q18 <= 4
+replace q19 = 2 if recq18 >= 5 & q18 <= 9
+replace q19 = 3 if recq18 >= 10 & q18 < .
+replace q19 = .d if recq18 == .d
+replace q19 = .r if recq18 == .r
 
 * q18/q19 mid-point var 
-gen q18_q19 = q18 
+gen q18_q19 = recq18 
 recode q18_q19 (998 999 = 0) if q19 == 0
 recode q18_q19 (998 999 = 2.5) if q19 == 1
 recode q18_q19 (998 999 = 7) if q19 == 2
@@ -459,15 +459,6 @@ recode q30 (4 = 1 "High cost (e.g., high out of pocket payment, not covered by i
 		   (1 = 15 "RO: Concern about informal payments/gifts") ///
 		   (.a = .a "NA") (.d = .d "Don't know") (.r = .r "Refused"), pre(rec) label(q30_label)
 drop q30
-
-recode q45 (3 = 0) ///
-           (2 = 1) ///
-           (1 = 2)
-
-label define q45_label 0 "Getting worse" ///
-                      1 "Staying the same" ///
-                      2 "Getting better"
-lab val q45 q45_label
 
 label copy q70 q35_label
 label copy q71 q36_label
