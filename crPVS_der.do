@@ -612,13 +612,15 @@ recode insur_type_universal (.a = 0) if q7_kr == 0
 
 recode insur_type_universal (.a = 1) if q6_it == 1
 recode insur_type_universal (.a = 0) if q6_it == 0
+recode insur_type_universal (.a = .r) if q6_it == .r
 
 recode insur_type_universal (. = .a) if q7 ==. & inlist(country, 11, 25) // just to clean up the "."
+recode insur_type_universal (.a = .r) if q7 == . & country == 11
 
 *Swiss updates to insur_type_universal (SS: ask for code review, this question was a multi-checkbox field so one participant could've checked multiple answers)
-recode insur_type_universal (. = 0) if q7i_ch == 1
+recode insur_type_universal (.a = 0) if q7i_ch == 1
 
-recode insur_type_universal (. = 1) if q7a_ch ==1 | /// Suppl dental ins.
+recode insur_type_universal (.a = 1) if q7a_ch ==1 | /// Suppl dental ins.
 										 q7b_ch ==1 | /// Suppl hosp. ins.
 										 q7c_ch ==1 | /// Suppl pharmacy ins.
 										 q7d_ch ==1 | /// Suppl alternative med. ins.
@@ -626,10 +628,18 @@ recode insur_type_universal (. = 1) if q7a_ch ==1 | /// Suppl dental ins.
 										 q7f_ch ==1 | /// Suppl ins. for sport and wellness
 										 q7g_ch ==1 // Suppl health ins. for travel
 										 
-recode insur_type_universal (. = .r) if q7a_ch !=1 & q7b_ch !=1 & ///
+recode insur_type_universal (.a = .r) if q7a_ch !=1 & q7b_ch !=1 & ///
 										 q7c_ch !=1 & q7d_ch !=1 & q7e_ch!=1 & ///
 										 q7f_ch !=1 & q7g_ch !=1 & q7h_ch !=1 & q7i_ch !=1 & ///
 										 q7j_ch == 1 // confirm this, especially the addition of "other here", essentially just trying to select the people who said yes only to "don't know/prefer not to answer"
+
+* recoding the remaining 9 NAs for CH
+recode insur_type_universal (.a = .r) if q7h_ch == 1 & q7j_ch == 1
+
+recode insur_type_universal (.a = 0) if q7a_ch !=1 & q7b_ch !=1 & ///
+										q7c_ch !=1 & q7d_ch !=1 & q7e_ch!=1 & ///
+										q7f_ch !=1 & q7g_ch !=1 & q7i_ch !=1 & ///
+										q7j_ch != 1 & q7h_ch == 1
 										 
 *removing these from finalized dataset (confirm if they should be kept in)
 drop q7a_ch q7b_ch q7c_ch q7d_ch q7e_ch q7f_ch q7g_ch q7h_ch q7i_ch q7j_ch
